@@ -1,4 +1,5 @@
 \documentclass{article}
+\usepackage{lmodern}
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage{mathrsfs}
 \usepackage[utf8]{inputenc}
@@ -13,9 +14,6 @@
 \usepackage[bottom]{footmisc}
 \usepackage{pdfpages}
 \usepackage{graphicx}
-\graphicspath{{./Images/Partie_1}}
-
-\newcommand\dboxed[1]{\dbox{\ensuremath{#1}}}
 
 \usepackage{mathtools}
 \newlength{\temp}
@@ -31,13 +29,9 @@
     pdftitle={Overleaf Example},
     pdfpagemode=FullScreen,
     }
-\usepackage[french]{babel}
+\usepackage{babel}
 \usepackage{mleftright,mathtools}
 \usepackage{bm}
-\AtBeginDocument{
-  \DeclareSymbolFont{AMSb}{U}{msb}{m}{n}
-  \DeclareSymbolFontAlphabet{\mathbb}{AMSb}
-  }
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \lhead{Ahou L. -  Ahou S. - Fiorini L. - Portier A.} % controls the left corner of the header
@@ -47,34 +41,6 @@
 \cfoot{} % controls the center of the footer
 \cfoot{~\thepage} % controls the right corner of the footer
 \usepackage{titlesec}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
-\usepackage{letltxmacro}
-
-\newcommand{\dx}{\mathrm{d}x}
-\newcommand{\dr}{\mathrm{d}r}
-\newcommand{\dt}{\mathrm{d}t}
-\LetLtxMacro{\OldSqrt}{\sqrt}
-\newcommand{\ClosedSqrt}[1][\hphantom{3}]{\def\DHLindex{#1}\mathpalette\DHLhksqrt}
-\makeatletter
-    \newcommand*\bold@name{bold}
-    \def\DHLhksqrt#1#2{%
-        \setbox0=\hbox{$#1\OldSqrt{#2\,}$}\dimen0=\ht0\relax%
-        \advance\dimen0-0.2\ht0\relax% size of the added box is still 0.2 times ht0
-        \setbox2=\hbox{\vrule height\ht0 depth -\dimen0}%
-        {\hbox{$#1\expandafter\OldSqrt\expandafter[\DHLindex]{#2\,}$}
-        \lower\ifx\math@version\bold@name0.6pt\else0.4pt\fi\box2}
-    }
-    % root index positioning and added space at the end, mostly noticeable in inline math mode
-    \renewcommand*{\sqrt}[2][\ ]{\ClosedSqrt[\leftroot{-2}\uproot{1}#1]{#2}\kern0.1em} 
-\makeatother
-\newcommand{\Chi}{\raisebox{0.25pt}[1ex][0.75ex]{$\chi$}}
-\usepackage{bigints}
-\newcommand{\R}{\mathbb{R}}
-\newcommand{\N}{\mathbb{N}}
-
-\thispagestyle{plain}
-\titlelabel{\thetitle \quad}
 
 
 
@@ -137,20 +103,19 @@ Nous cherchons donc à maximiser la valeur minimale de la production totale. Ave
 \end{align*}
 Cependant, celui-ci n'est pas linéaire à cause de la fonction $\min$. Nous introduisons alors une variable intermédiaire $\gamma$ afin de remplacer le $\min$ par un problème de maximisation comme vu au cours. Le nouveau modèle, maintenant linéaire, s'écrit comme suit \footnote{La contrainte imposant que la variable $\gamma$ soit positive n'est pas nécessaire car le minimum est strictement positif et que $\gamma$ prendra cette valeur.} :
 \begin{align}
-    \max_{c_i, \gamma} \quad  
-    &\gamma \nonumber \\ 
-    \sum_{i=0}^{n-1} c_i &= P \label{eq:contr_1}\\
-    \sum_{\text{\tiny offshore}}c_i &= \kappa P \label{eq:contr_2}\\
-    \gamma &\le \sum_{i=0}^{n-1} c_i e_i(t_j) \quad \forall j \in \{0, \ldots, m-1\}\label{eq:contr_3}\\
-    0 &\le \, c_i \, \le c_i^{\max} \quad \forall i \in \{0, \ldots, n-1\} \label{eq:contr_4}
+    \max_{c_i, \gamma} \quad &\gamma \nonumber \\ 
+    \sum_{i=0}^{n-1} c_i &= P\\
+    \sum_{\text{\tiny offshore}}c_i &= \kappa P\\
+    \gamma &\le \sum_{i=0}^{n-1} c_i e_i(t_j) \quad \forall j \in \{0, \ldots, m-1\}\\
+    0 &\le \, c_i \, \le c_i^{\max} \quad \forall i \in \{0, \ldots, n-1\}
 \end{align}
-La contrainte (\ref{eq:contr_1}) représente la puissance totale qu'il faut installer en Europe. La contrainte (\ref{eq:contr_2}) indique qu'il faut exactement une proportion $\kappa$ de la puissance $P$ installée en \textit{offshore}. La contrainte (\ref{eq:contr_3}) dit que la variable intermédiaire $\gamma$ ne doit pas dépasser la valeur du minimum de la fonction de production totale. Enfin, la contrainte (\ref{eq:contr_4}) indique les bornes sur les variables $c_i$
+La contrainte (1) représente la puissance totale qu'il faut installer en Europe. La contrainte (2) indique qu'il faut exactement une proportion $\kappa$ de la puissance $P$ installée en \textit{offshore}. La contrainte (3) dit que la variable intermédiaire $\gamma$ ne doit pas dépasser la valeur du minimum de la fonction de production totale. Enfin, la contrainte (4) indique les bornes sur les variables $c_i$
 
 \subsubsection*{Estimation de la taille du modèle}
 \noindent
 Au total, nous avons $\overbrace{n}^{c_i} + \overbrace{1}^{\gamma}$
 variables et $\overbrace{m}^{\text{(3)}} + \overbrace{2}^{\text{(1) \& (2)}}$ contraintes \textbf{en plus} des bornes sur les $c_i$.\\
-Cependant, lors de la résolution le \textit{solver} traduit le problème sous forme standard. Ainsi, il introduit $n + m$ variables de \textit{slack} qui correspondent au contraintes (\ref{eq:contr_3}) et (\ref{eq:contr_4}). Nous nous retrouvons alors avec le problème suivant : 
+Cependant, lors de la résolution le \textit{solver} traduit le problème sous forme standard. Ainsi, il introduit $n + m$ variables de \textit{slack} qui correspondent au contraintes (3) et (4). Nous nous retrouvons alors avec le problème suivant : 
 \begin{align*}
     \max_{c_i, \gamma} \quad  
     &\gamma \nonumber \\ 
@@ -169,7 +134,7 @@ La répartition de puissance est représentée sur la carte ci-dessous \footnote
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.5]{Q1/capacity_distribution.pdf}
+    \includegraphics[scale=0.5]{Images/Partie_1/Q1/capacity_distribution.pdf}
     \caption{Carte représentant la répartition de puissance sur les différents sites d'éoliennes}
     \label{fig:capacity_distribution_partie1}
 \end{figure}
@@ -180,7 +145,7 @@ Quant au temps de résolution du solver, celui-ci prend en moyenne $1.825 [\math
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.5]{Q1/execution_time.pdf}
+    \includegraphics[scale=0.5]{Images/Partie_1/Q1/execution_time.pdf}
     \caption{Graphe du temps d'exécution sur 100 itérations}
     \label{fig:execution_time_partie1}
 \end{figure}
@@ -191,7 +156,7 @@ il est possible de calculer, en chaque heure, l'énergie produite. Le graphe rep
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.5]{Q1/energy_produced.pdf}
+    \includegraphics[scale=0.5]{Images/Partie_1/Q1/energy_produced.pdf}
     \caption{Graphe de la production d'énergie en fonction du temps}
     \label{fig:energy_produced_partie1}
 \end{figure}
@@ -202,7 +167,7 @@ Nous obtenons alors le graphe suivant où nous pouvons observer une moyenne de $
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.5]{Q1/efficiency.pdf}
+    \includegraphics[scale=0.5]{Images/Partie_1/Q1/efficiency.pdf}
     \caption{Graphe du rendement de production en fonction du temps}
     \label{fig:efficiency_partie1}
 \end{figure}
@@ -211,8 +176,16 @@ Nous obtenons alors le graphe suivant où nous pouvons observer une moyenne de $
 \subsubsection*{(a)}
 Nous avons vu au cours que les variables du problème dual associé au primal permettent de calculer la variation de la fonction objectif
 lorsque l'on modifie la valeur d'une des contraintes. Lorsque l'on change la valeur de la puissance maximale installable de $P$ à $\Delta P$, la variable $y_1$ du problème dual nous indiquera de combien change
-la fonction objectif (i.e. la valeur de production minimale). 
+la fonction objectif (i.e. la valeur de production minimale). Nous avons donc :
+\begin{equation*}
+    \Delta \gamma = y_1 \Delta P
+\end{equation*}
 
+\subsubsection*{(b)}
+Pour déterminer les sites les plus rentables sur lesquels on augmenterait la capacité dans le cas d'une modification de la puissance maximale installable, il suffit de regarder les variables duales associées aux contraintes de capacité maximale installable. En effet, ces variables nous indiquent de combien la fonction objectif varie lorsque l'on modifie la capacité maximale installable d'un site.
+Nous pouvons donc résoudre le problème dual associé au primal pour obtenir ces valeurs. Après résolution, nous obtenons que les dix sites les plus intéressants sont les sites $\{241, 296, 311, 312, 313, 314, 315, 330, 434, 437\}$.\\
+Cependant, lorsque nous regardons les sites où le rendement moyen est maximal, nous obtenons : $$\{ 69, 166, 167, 235, 236, 237, 434, 447, 525, 623 \}$$
+Nous voyons donc que, sauf exception, il n'y pas de lien entre les sites les plus rentables quant à l'augmentation de la puissance installable et ceux où le rendement est maximal.
 \newpage
 
 \section*{Question 2}
@@ -244,32 +217,39 @@ Enfin, bien que cela ne soit pas nécessaire, nous imposons que les quantités d
 
 \subsection*{B.}
 Nous allons maintenant résoudre ce nouveau problème pour différentes valeurs de $E_{\text{max}}$.\\
-Nous avons décidé de prendre une plage de valeur allant de $0$ à $10^9 [\mathrm{MWh}]$
-\footnote{L'énergie maximale productible est $P\times m = 4.38\times 10^9 [\mathrm{MWh}]$. En prenant $E_{\text{max}} = 10^9 [\mathrm{MWh}]$, on reste dans une plage de valeurs raisonnable car cela représente une fraction de la quantité totale d'énergie productible.}
+Nous avons décidé de prendre une plage de valeur allant de $0$ à $10^{9} [\mathrm{MWh}]$
+\footnote{Nous avons choisi une telle plage de valeurs pour bien mettre en évidence un changement de comportement dans le graphe d'après.}
 et nous résolvons le problème par incrément de $10^8 [\mathrm{MWh}]$.\\
 Voici le graphe représentant le minimum de production d'énergie en fonction de la quantité d'énergie achetable :
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.5]{Q2/minimal_energy_produced.pdf}
+    \includegraphics[scale=0.5]{Images/Partie_1/Q2/minimal_energy_produced.pdf}
     \caption{Graphe du minimum de production en fonction de l'énergie maximale achetable}
     \label{fig:minimal_energy_produced_Q2}
 \end{figure}
 \noindent
-Comme nous pouvons le voir, au plus nous achetons de l'énergie, au mieux c'est. Nous choisissons donc une valeur de $E_{\text{max}} = 10^9 [\mathrm{MWh}]$.\\
-Nous avons représenté ci-dessous la production totale d'énergie en fonction du temps ainsi que les productions éoliennes et l'énergie achetée individuellement :
+
+Le choix le plus intéressant est en fait l'endroit où la pente est maximale. En effet, en ce point là, acheter une quantité supplémentaire d'énergie amène à une augmentation maximale du minimum de production totale. Le graphe de la pente du graphe ci-dessus est représenté ci-dessous :
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.3]{Q2/energy_produced_and_bought.pdf}
-    \caption{Graphe de la production totale d'énergie pour $E_{\text{max}} = 10^9 [\mathrm{MWh}]$}
-    \label{fig:total_energy_produced_and_bought_Q2}
+    \includegraphics[scale=0.5]{Images/Partie_1/Q2/increase_minimal_energy_produced.pdf}
+    \caption{Graphe de la production minimale marginale en fonction de la quantité d'énergie achetable}
+    \label{fig:increase_minimal_production_Q2}
 \end{figure}
 
-\noindent
-Comme nous pouvons le voir sur les graphes, le solver achète de l'énergie afin que la production soit constante au cours de l'année.\\
-Cette décision était prévisible puisque l'objectif est de maximiser le minimum de production. La solution optimale est donc lorsque le minimum atteint le maximum du graphe ce qui implique que la fonction est constante.
-
 \pagebreak
+
+Nous voyons ici que la production minimale marginale est maximale pour une valeur de $E_{\text{max}} = 1e8 [\mathrm{MWh}]$.
+Nous prenons alors cette valeur pour représenter la production totale (donc en prenant compte à la fois l'énergie produite et l'énergie achetée). 
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[scale=0.3]{Images/Partie_1/Q2/energy_produced_and_bought.pdf}
+    \caption{Graphe de la production totale d'énergie pour $E_{\text{max}} = 1e8 [\mathrm{MWh}]$}
+    \label{fig:total_energy_produced_and_bought_Q2}
+\end{figure}
+Comme nous le voyons sur la figure ci-dessus, la possibilité d'acheter de l'énergie va servir à remonter et à équilibrer les valeurs inférieures de productions d'énergie, d'où le fait que le graphe soit "plat" en-dessous.
 
 \end{document} 
