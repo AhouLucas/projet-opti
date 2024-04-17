@@ -1,0 +1,275 @@
+\documentclass{article}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{mathrsfs}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, fge}
+\usepackage[amsmath,thmmarks]{ntheorem}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsfonts}
+\usepackage{upgreek}
+\usepackage{dashbox}
+\usepackage[bottom]{footmisc}
+\usepackage{pdfpages}
+\usepackage{graphicx}
+\graphicspath{{./Images/Partie_1}}
+
+\newcommand\dboxed[1]{\dbox{\ensuremath{#1}}}
+
+\usepackage{mathtools}
+\newlength{\temp}
+\usepackage{siunitx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{amsbsy}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+\usepackage[french]{babel}
+\usepackage{mleftright,mathtools}
+\usepackage{bm}
+\AtBeginDocument{
+  \DeclareSymbolFont{AMSb}{U}{msb}{m}{n}
+  \DeclareSymbolFontAlphabet{\mathbb}{AMSb}
+  }
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{Ahou L. -  Ahou S. - Fiorini L. - Portier A.} % controls the left corner of the header
+\chead{} % controls the center of the header
+\rhead{Groupe 49} % controls the right corner of the header
+\lfoot{} % controls the left corner of the footer
+\cfoot{} % controls the center of the footer
+\cfoot{~\thepage} % controls the right corner of the footer
+\usepackage{titlesec}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\usepackage{letltxmacro}
+
+\newcommand{\dx}{\mathrm{d}x}
+\newcommand{\dr}{\mathrm{d}r}
+\newcommand{\dt}{\mathrm{d}t}
+\LetLtxMacro{\OldSqrt}{\sqrt}
+\newcommand{\ClosedSqrt}[1][\hphantom{3}]{\def\DHLindex{#1}\mathpalette\DHLhksqrt}
+\makeatletter
+    \newcommand*\bold@name{bold}
+    \def\DHLhksqrt#1#2{%
+        \setbox0=\hbox{$#1\OldSqrt{#2\,}$}\dimen0=\ht0\relax%
+        \advance\dimen0-0.2\ht0\relax% size of the added box is still 0.2 times ht0
+        \setbox2=\hbox{\vrule height\ht0 depth -\dimen0}%
+        {\hbox{$#1\expandafter\OldSqrt\expandafter[\DHLindex]{#2\,}$}
+        \lower\ifx\math@version\bold@name0.6pt\else0.4pt\fi\box2}
+    }
+    % root index positioning and added space at the end, mostly noticeable in inline math mode
+    \renewcommand*{\sqrt}[2][\ ]{\ClosedSqrt[\leftroot{-2}\uproot{1}#1]{#2}\kern0.1em} 
+\makeatother
+\newcommand{\Chi}{\raisebox{0.25pt}[1ex][0.75ex]{$\chi$}}
+\usepackage{bigints}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+
+\thispagestyle{plain}
+\titlelabel{\thetitle \quad}
+
+
+
+\begin{document}
+
+\input{page_guard}
+
+\section*{Question 1}
+
+\subsection*{A.}
+\subsubsection*{Modélisation du problème}
+Afin de garantir que le niveau de production ne soit pas trop bas, il nous a été demandé de maximiser le niveau minimal de production au cours de l'année. Nous allons discuter dans cette section de notre choix de modélisation pour ce problème.\\
+Vous trouverez ci-dessous une table regroupant les notations utilisées dans notre modèle \footnote{Bien que $n$ et $m$ soient des constantes, nous utilisons ces notations pour alléger les formules et également pour rester dans un cadre général. Tout autre paramètre/variable sera introduit lorsque cela sera nécessaire.}:
+\begin{table}[h!]
+\centering
+\renewcommand{\arraystretch}{1.5}% Add spacing between rows : default value is 1
+\begin{tabular}{|c || c |} 
+ \hline
+Nom & Signification\\
+ \hline\hline
+ $P$  & Puissance totale à installer\\
+ $\kappa \in [0, 1]$ & Proportion de la puissance totale à installer en sites \textit{offshore}\\
+ $c^\text{max}_i$ & Capacité maximale installable pour le i\textsuperscript{ème} site\\
+ $c_i \in [0, c_i^{\max}]$ & Capacité effectivement installée sur le i\textsuperscript{ème} site\\
+ $e_i(t) \in [0,1]$ & Rendement du i\textsuperscript{ème} site au temps $t$\\
+ $n$ & Nombre de sites\\
+ $m$ & Nombre d'heures dans une année\\
+ \hline
+\end{tabular}
+\caption{Table des notations utilisées pour le modèle}
+\label{table:noms_des_variables}
+\end{table}
+\noindent \\
+Parmi toutes ces variables, ce sont les $c_i$ que nous cherchons à optimiser. L'idée derrière notre choix de modèle est la suivante : \\
+Pour toutes les heures de l'année, nous prenons la somme de production de tous les sites en tenant compte du choix des $c_i$. Nous obtenons ainsi une fonction de la production totale en fonction du temps et dont l'allure dépend du choix des $c_i$.
+Un tableau illustratif est repris ci-dessous :
+\begin{table}[h!]
+\centering
+    \[ \begin{array}{c|cccc}
+      t_i    & {t_0} & {t_1} & {\ldots}  & {t_{m-1}}\\
+      \hline
+      e_0(t_i) & 0.25       & 0.08   &\ldots    & 0.17 \\
+      e_1(t_i) & 0.87       & 0.69   &\ldots    & 0.42 \\
+      \vdots   & \vdots     & \vdots  &\vdots   & \vdots \\
+      e_{n-1}(t_i) & 0.15       & 0.207   &\ldots    & 0.94 \\
+      \hline
+      \text{Prod. totale} &\scriptstyle \sum \limits_{i=0}^{n-1}c_i e_i(t_0) &\ldots &\ldots &\scriptstyle \sum \limits_{i=0}^{n-1}c_i e_i(t_{m-1})\\
+    \end{array} \]
+\caption{Table représentant les valeurs de rendement de chaque site ainsi que la production totale en fonction du temps (à titre illustratif).}
+\label{table:table_rendement_illustratif}
+\end{table}
+\newpage
+Nous cherchons donc à maximiser la valeur minimale de la production totale. Avec toutes ces informations, nous pouvons écrire notre modèle :
+\begin{align*}
+    \max_{c_i} \quad  
+    \min_t \{ &\sum_{i=0}^{n-1}c_i e_i(t) \} \\ 
+    \sum_{i=0}^{n-1} c_i &= P\\
+    \sum_{\text{\tiny offshore}}c_i &= \kappa P\\
+    0 &\le \, c_i \, \le c_i^{\max}\\
+\end{align*}
+Cependant, celui-ci n'est pas linéaire à cause de la fonction $\min$. Nous introduisons alors une variable intermédiaire $\gamma$ afin de remplacer le $\min$ par un problème de maximisation comme vu au cours. Le nouveau modèle, maintenant linéaire, s'écrit comme suit \footnote{La contrainte imposant que la variable $\gamma$ soit positive n'est pas nécessaire car le minimum est strictement positif et que $\gamma$ prendra cette valeur.} :
+\begin{align}
+    \max_{c_i, \gamma} \quad  
+    &\gamma \nonumber \\ 
+    \sum_{i=0}^{n-1} c_i &= P \label{eq:contr_1}\\
+    \sum_{\text{\tiny offshore}}c_i &= \kappa P \label{eq:contr_2}\\
+    \gamma &\le \sum_{i=0}^{n-1} c_i e_i(t_j) \quad \forall j \in \{0, \ldots, m-1\}\label{eq:contr_3}\\
+    0 &\le \, c_i \, \le c_i^{\max} \quad \forall i \in \{0, \ldots, n-1\} \label{eq:contr_4}
+\end{align}
+La contrainte (\ref{eq:contr_1}) représente la puissance totale qu'il faut installer en Europe. La contrainte (\ref{eq:contr_2}) indique qu'il faut exactement une proportion $\kappa$ de la puissance $P$ installée en \textit{offshore}. La contrainte (\ref{eq:contr_3}) dit que la variable intermédiaire $\gamma$ ne doit pas dépasser la valeur du minimum de la fonction de production totale. Enfin, la contrainte (\ref{eq:contr_4}) indique les bornes sur les variables $c_i$
+
+\subsubsection*{Estimation de la taille du modèle}
+\noindent
+Au total, nous avons $\overbrace{n}^{c_i} + \overbrace{1}^{\gamma}$
+variables et $\overbrace{m}^{\text{(3)}} + \overbrace{2}^{\text{(1) \& (2)}}$ contraintes \textbf{en plus} des bornes sur les $c_i$.\\
+Cependant, lors de la résolution le \textit{solver} traduit le problème sous forme standard. Ainsi, il introduit $n + m$ variables de \textit{slack} qui correspondent au contraintes (\ref{eq:contr_3}) et (\ref{eq:contr_4}). Nous nous retrouvons alors avec le problème suivant : 
+\begin{align*}
+    \max_{c_i, \gamma} \quad  
+    &\gamma \nonumber \\ 
+    \sum_{i=0}^{n-1} c_i &= P\\
+    \sum_{\text{\tiny offshore}}c_i &= \kappa P\\
+    \gamma + s_j &= \sum_{i=0}^{n-1} c_i e_i(t_j) \quad \forall j \in \{0, \ldots, m-1\}\\
+    c_i + t_i &\le c_i^{\max} \quad \forall i \in \{0, \ldots, n-1\}\\
+    c_i, \gamma, s_j, t_i &\ge 0
+\end{align*}
+Ce qui mène à un total de $2n + m + 1$ variables et $m + n + 2$ contraintes.
+
+\subsection*{B.}
+Pour résoudre le modèle décrit dans la section précédente, nous avons utilisé la fonction \verb|linprog| de la librairie \verb|SciPy|.\\
+La solution retournée par le solver pour les paramètres $P = 500000 [\mathrm{MW}]$ et $\kappa = 0.17$ nous indique qu'il y a $267$ sites sur lesquels la puissance installée est non nulle, ce qui veut dire qu'il y a $642 - 267 = 375$ sites sur lesquels il est préférable de ne pas installer d'éoliennes.\\
+La répartition de puissance est représentée sur la carte ci-dessous \footnote{Les croix représentent les sites sur lesquels la puissance installée est nulle.} :
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{Q1/capacity_distribution.pdf}
+    \caption{Carte représentant la répartition de puissance sur les différents sites d'éoliennes}
+    \label{fig:capacity_distribution_partie1}
+\end{figure}
+
+\newpage
+
+Quant au temps de résolution du solver, celui-ci prend en moyenne $1.825 [\mathrm{s}]$ pour renvoyer une solution. Un graphe des performances est représenté ci-dessous :
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{Q1/execution_time.pdf}
+    \caption{Graphe du temps d'exécution sur 100 itérations}
+    \label{fig:execution_time_partie1}
+\end{figure}
+
+Nous pouvons également nous intéresser à l'énergie totale produite sur l'année ainsi que sur chaque période d'une heure.
+En prenant compte des rendements qui nous ont été fournis et en utilisant la solution obtenue par le solver,
+il est possible de calculer, en chaque heure, l'énergie produite. Le graphe représentant la production d'énergie en fonction du temps est représenté ci-dessous :
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{Q1/energy_produced.pdf}
+    \caption{Graphe de la production d'énergie en fonction du temps}
+    \label{fig:energy_produced_partie1}
+\end{figure}
+Et en sommant toutes les productions, nous obtenons une valeur d'environ $1828762.56 [\mathrm{GWh}]$. 
+\newpage
+Nous pouvons, de manière similaire, calculer le rendement de production simplement en divisant la production sur une heure par la production idéale (i.e. $P*1\mathrm{h} = P [\mathrm{MWh}]$).\\
+Nous obtenons alors le graphe suivant où nous pouvons observer une moyenne de $42\%$ de rendement :
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{Q1/efficiency.pdf}
+    \caption{Graphe du rendement de production en fonction du temps}
+    \label{fig:efficiency_partie1}
+\end{figure}
+
+\subsection*{C.}
+\subsubsection*{(a)}
+Nous avons vu au cours que les variables du problème dual associé au primal permettent de calculer la variation de la fonction objectif
+lorsque l'on modifie la valeur d'une des contraintes. Lorsque l'on change la valeur de la puissance maximale installable de $P$ à $\Delta P$, la variable $y_1$ du problème dual nous indiquera de combien change
+la fonction objectif (i.e. la valeur de production minimale). 
+
+\newpage
+
+\section*{Question 2}
+
+\subsection*{A.}
+Dans cette deuxième question, nous avons maintenant la possibilité
+d'acheter de l'énergie en chaque heure en plus de l'énergie produite par les éoliennes.
+Toutefois, nous pouvons acheter qu'une quantité maximale $E_{\text{max}}$ d'énergie.\\
+
+\subsubsection*{Modélisation du nouveau problème}
+Pour représenter l'achat d'énergie en chaque heure de l'année, nous pouvons introduire $m$ nouvelles variables $a_j$ pour $j \in \{ 0, \ldots, m-1 \}$.\\
+Notre nouveau vecteur de variables de décisions devient alors : 
+\[ \bm{x} = (c_0, \ldots, c_{n-1}, a_0, \ldots, a_{m-1}, \gamma )^\intercal \]
+Et notre nouveau problème devient donc :
+\begin{align*}
+    \max_{c_i, a_j, \gamma} \quad  &\gamma \\ 
+    \sum_{i=0}^{n-1} c_i &= P\\
+    \sum_{\text{\tiny offshore}}c_i &= \kappa P\\
+    \gamma &\le \sum_{i=0}^{n-1} c_i e_i(t_j) + a_j \quad \forall j \in \{0, \ldots, m-1\}\\
+    \sum _{j=0}^{m-1} a_j &\le E_{\text{max}}\\
+    0 &\le \, c_i \, \le c_i^{\max} \quad \forall i \in \{0, \ldots, n-1\}\\
+    a_j &\ge 0 \quad \forall j \in \{0, \ldots, m-1\}
+\end{align*}
+Où nous prenons également compte de l'énergie achetée en chaque heure dans le bilan de production d'énergie horaire (3\textsuperscript{e} contrainte).
+De plus, une contrainte supplémentaire vient s'ajouter pour limiter la quantité totale d'énergie achetée. La somme des énergies achetées en chaque heure doit être inférieure à $E_{\text{max}}$ (4\textsuperscript{e} contrainte).\\
+Enfin, bien que cela ne soit pas nécessaire, nous imposons que les quantités d'énergies achetées en chaque heure soient positives.
+
+\pagebreak
+
+\subsection*{B.}
+Nous allons maintenant résoudre ce nouveau problème pour différentes valeurs de $E_{\text{max}}$.\\
+Nous avons décidé de prendre une plage de valeur allant de $0$ à $10^9 [\mathrm{MWh}]$
+\footnote{L'énergie maximale productible est $P\times m = 4.38\times 10^9 [\mathrm{MWh}]$. En prenant $E_{\text{max}} = 10^9 [\mathrm{MWh}]$, on reste dans une plage de valeurs raisonnable car cela représente une fraction de la quantité totale d'énergie productible.}
+et nous résolvons le problème par incrément de $10^8 [\mathrm{MWh}]$.\\
+Voici le graphe représentant le minimum de production d'énergie en fonction de la quantité d'énergie achetable :
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{Q2/minimal_energy_produced.pdf}
+    \caption{Graphe du minimum de production en fonction de l'énergie maximale achetable}
+    \label{fig:minimal_energy_produced_Q2}
+\end{figure}
+\noindent
+Comme nous pouvons le voir, au plus nous achetons de l'énergie, au mieux c'est. Nous choisissons donc une valeur de $E_{\text{max}} = 10^9 [\mathrm{MWh}]$.\\
+Nous avons représenté ci-dessous la production totale d'énergie en fonction du temps ainsi que les productions éoliennes et l'énergie achetée individuellement :
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.3]{Q2/energy_produced_and_bought.pdf}
+    \caption{Graphe de la production totale d'énergie pour $E_{\text{max}} = 10^9 [\mathrm{MWh}]$}
+    \label{fig:total_energy_produced_and_bought_Q2}
+\end{figure}
+
+\noindent
+Comme nous pouvons le voir sur les graphes, le solver achète de l'énergie afin que la production soit constante au cours de l'année.\\
+Cette décision était prévisible puisque l'objectif est de maximiser le minimum de production. La solution optimale est donc lorsque le minimum atteint le maximum du graphe ce qui implique que la fonction est constante.
+
+\pagebreak
+
+\end{document} 
