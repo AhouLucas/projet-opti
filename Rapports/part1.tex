@@ -134,7 +134,7 @@ La répartition de puissance est représentée sur la carte ci-dessous \footnote
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.5]{Images/Partie_1/Q1/capacity_distribution.pdf}
+    \includegraphics[scale=0.4]{Images/Partie_1/Q1/capacity_distribution.pdf}
     \caption{Carte représentant la répartition de puissance sur les différents sites d'éoliennes}
     \label{fig:capacity_distribution_partie1}
 \end{figure}
@@ -251,5 +251,103 @@ Nous prenons alors cette valeur pour représenter la production totale (donc en 
     \label{fig:total_energy_produced_and_bought_Q2}
 \end{figure}
 Comme nous le voyons sur la figure ci-dessus, la possibilité d'acheter de l'énergie va servir à remonter et à équilibrer les valeurs inférieures de productions d'énergie, d'où le fait que le graphe soit "plat" en-dessous.
+
+
+\section*{Question 3}
+
+\subsection*{A.}
+Nous souhaitons à présent maximiser la production totale d'énergie sur l'année tout en respectant les mêmes contraintes qu'à la question 1 quant à la puissance totale et en offshore à installer.\\
+Toutefois, nous souhaitons limiter la variabilité moyenne de la production d'énergie sur l'année à une valeur inférieure à $\delta P T$ où $\delta$ représente une une proportion de l'énergie maximale productible sur une période de $T [h]$. Le modèle s'écrit alors :
+
+\begin{align*}
+    \max_{c_i} \quad  
+    &\sum_{j = 0}^{m-1} \sum_{i = 0}^{n-1} c_i e_i(t_j) \\ 
+    \sum_{i=0}^{n-1} c_i &= P\\
+    \sum_{\text{\tiny offshore}}c_i &= \kappa P\\
+    \left( \frac{\sum_{k = 0}^{\frac{m}{T} - 2} \Delta_k }{\frac{m}{T} - 1}\right) &\leq \delta PT\\
+    0 &\le \, c_i \, \le c_i^{\max} \quad \forall i \in \{0, \ldots, n-1\}
+\end{align*}
+
+où nous avons défini pour tout $k \in \{ 0, \ldots, \frac{m}{T} - 2 \}$ :
+
+\begin{align*}
+    \epsilon_k &= \sum_{j = kT}^{(k+1)T - 1} \sum_{i = 0}^{n-1} c_i e_i(t_j) = \sum_{i=0}^{n-1} c_i \sum_{j = kT}^{(k+1)T - 1} e_i(t_j)\\
+    \Delta_k &= | \epsilon_{k+1} - \epsilon_k |
+\end{align*}
+
+Les valeurs absolues se trouvant dans les contraintes posent problèmes car celles-ci ne sont pas linéaires. Cependant, nous pouvons imposer deux contraintes supplémentaires pour chaque $\Delta_k$ afin de les rendre linéaires :
+
+\begin{align*}
+    \Delta_k &\leq \epsilon_{k+1} - \epsilon_k\\
+    \Delta_k &\leq \epsilon_k - \epsilon_{k+1}
+\end{align*}
+
+Nous avons alors :
+
+\begin{align*}
+    \max_{c_i, \Delta_k} \quad  
+    &\sum_{i=0}^{n-1} c_i \sum_{j = 0}^{m - 1} e_i(t_j) \\ 
+    \sum_{i=0}^{n-1} c_i &= P\\
+    \sum_{\text{\tiny offshore}}c_i &= \kappa P\\
+    \left( \frac{\sum_{k = 0}^{\frac{m}{T} - 2} \Delta_k }{\frac{m}{T} - 1}\right) &\leq \delta PT\\
+    \Delta_k &\ge \epsilon_{k+1} - \epsilon_k \quad \forall k \in \{ 0, \ldots, \frac{m}{T} - 2 \}\\
+    \Delta_k &\ge \epsilon_k - \epsilon_{k+1}\\
+    0 &\le \, c_i \, \le c_i^{\max} \quad \forall i \in \{0, \ldots, n-1\}
+\end{align*}
+
+où nous avons reformulé la fonction objectif en mettant en évidence les $c_i$.
+
+\subsection*{B.}
+Après résolution du modèle, nous obtenons une nouvelle répartition de la puissance installée. Cette fois-ci, nous avons 312 sites sur lesquels la puissance installée est non nulle. La répartition est représentée sur la carte ci-dessous :
+
+\begin{figure*}[h!]
+    \centering
+    \includegraphics[scale=0.4]{Images/Partie_1/Q3/capacity_distribution.pdf}
+    \caption{Carte représentant la répartition de puissance sur les différents sites d'éoliennes}
+    \label{fig:capacity_distribution_partie1_Q3}
+\end{figure*}
+
+\newpage
+
+La production totale d'énergie au cours de l'année est de $1957551.15 [\mathrm{GWh}]$, contre $1828762.56 [\mathrm{GWh}]$ pour la question 1. Nous avons comparé la production en fonction du temps avec celle obtenue à la question 1 et nous avons obtenu le graphe suivant :
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{Images/Partie_1/Q3/energy_produced_comparison.pdf}
+    \caption{Graphe de la production d'énergie en fonction du temps}
+    \label{fig:energy_produced_partie1_Q3}
+\end{figure}
+
+Comme attendu, nous observons que le minimum de production est plus élevé pour le modèle de la question 1 tandis que le modèle de la question 3 permet d'obtenir une production totale d'énergie plus élevée.\\
+Lorsque nous nous intéressons à la variabilité moyenne de production, nous observons que celle-ci atteint la valeur de $\delta P T = 30 000$ (avec $\delta = 0.02, P = 500 000 [\mathrm{MW}]$ et $T = 3 [\mathrm{h}]$).\\
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{Images/Partie_1/Q3/variability_comparison.pdf}
+    \caption{Graphe de la variabilité de production en fonction du temps}
+    \label{fig:variability_comparison_Q3}
+\end{figure}
+
+\newpage
+
+\section*{Conclusion}
+Voici un tableau récapitulatif reprenant les caractéristiques de chacun des trois modèles présentés dans cette première partie du projet :
+\begin{center}
+    \begin{tabular}{c| c c c }
+        Caractéristiques & Question 1 & Question 2 & Question 3\\
+        \hline
+        Nombre de sites non nulles & 267 & 267 & 312\\
+        Production totale d'énergie $[\mathrm{GWh}]$& $1828762.56$ & $2035764.02$ & $1957551.15$\\
+        Minimum de production $[\mathrm{MWh}]$ & $108249.48$ & $203397.45$ & $77793.64$\\
+        Maximum de production $[\mathrm{MWh}]$ & $319059.43$ & $332235.91$ & $348449.77$\\
+        Variabilité moyenne de production & $28742.42$ & $20511.61$ & $29789.53$\\
+        \hline
+    \end{tabular}
+\end{center}
+
+\medskip
+Bien que le modèle de la question 3 avait pour but de limiter la variabilité moyenne de production, nous observons que celle-ci est plus élevée que pour les modèles des question 1 et 2. Cela est dû au fait que le modèle de la question 3 cherche à maximiser la production totale d'énergie, ce qui peut amener à des différences élevées entre les maximums et minimums de productions.\\
+Nous voyons cependant bien les différences de comportement entre les trois modèles quant aux minimums et maximums de production d'énergie. Le modèle de la question 2 permet d'obtenir un minimum de production plus élevé que les deux autres modèles car l'objectif est de maximiser ce minimum avec la possibilité d'acheter de l'énergie. Le modèle de la question 3 permet d'obtenir une production totale d'énergie plus élevée que le modèle de la question 1 et 2 car l'objectif est de maximiser cette production totale.\\
+
 
 \end{document} 
