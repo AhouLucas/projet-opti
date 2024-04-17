@@ -74,7 +74,7 @@ Nom & Signification\\
 \label{table:noms_des_variables}
 \end{table}
 \noindent \\
-Parmi toutes ces variables, ce sont les $c_i$ que nous cherchons à optimiser. L'idée derrière notre choix de modèle est la suivante : \\
+Parmi toutes ces variables, le problème d'optimisation porte sur le choix des $c_i$. L'idée derrière notre choix de modèle est la suivante : \\
 Pour toutes les heures de l'année, nous prenons la somme de production de tous les sites en tenant compte du choix des $c_i$. Nous obtenons ainsi une fonction de la production totale en fonction du temps et dont l'allure dépend du choix des $c_i$.
 Un tableau illustratif est repris ci-dessous :
 \begin{table}[h!]
@@ -96,10 +96,10 @@ Un tableau illustratif est repris ci-dessous :
 Nous cherchons donc à maximiser la valeur minimale de la production totale. Avec toutes ces informations, nous pouvons écrire notre modèle :
 \begin{align*}
     \max_{c_i} \quad  
-    \min_t \{ &\sum_{i=0}^{n-1}c_i e_i(t) \} \\ 
+    \min_t  \biggl\{ &\sum_{i=0}^{n-1}c_i e_i(t) \biggl\} \\ 
     \sum_{i=0}^{n-1} c_i &= P\\
     \sum_{\text{\tiny offshore}}c_i &= \kappa P\\
-    0 &\le \, c_i \, \le c_i^{\max}\\
+    0 &\le \, c_i \, \le c_i^{\max} \quad \forall i \in \{0, \ldots, n-1\}
 \end{align*}
 Cependant, celui-ci n'est pas linéaire à cause de la fonction $\min$. Nous introduisons alors une variable intermédiaire $\gamma$ afin de remplacer le $\min$ par un problème de maximisation comme vu au cours. Le nouveau modèle, maintenant linéaire, s'écrit comme suit \footnote{La contrainte imposant que la variable $\gamma$ soit positive n'est pas nécessaire car le minimum est strictement positif et que $\gamma$ prendra cette valeur.} :
 \begin{align}
@@ -114,10 +114,10 @@ La contrainte (1) représente la puissance totale qu'il faut installer en Europe
 \subsubsection*{Estimation de la taille du modèle}
 \noindent
 Au total, nous avons $\overbrace{n}^{c_i} + \overbrace{1}^{\gamma}$
-variables et $\overbrace{m}^{\text{(3)}} + \overbrace{2}^{\text{(1) \& (2)}}$ contraintes \textbf{en plus} des bornes sur les $c_i$.\\
+variables et $\overbrace{m}^{\text{(3)}} + \overbrace{2}^{\text{(1) \& (2)}}$ contraintes \textbf{en plus} des "$2n$" contraintes par rapport aux bornes sur les $c_i$.\\
 Cependant, lors de la résolution le \textit{solver} traduit le problème sous forme standard. Ainsi, il introduit $n + m$ variables de \textit{slack} qui correspondent au contraintes (3) et (4). Nous nous retrouvons alors avec le problème suivant : 
 \begin{align*}
-    \max_{c_i, \gamma} \quad  
+    \max_{c_i, \gamma, s_j, t_i} \quad  
     &\gamma \nonumber \\ 
     \sum_{i=0}^{n-1} c_i &= P\\
     \sum_{\text{\tiny offshore}}c_i &= \kappa P\\
@@ -141,34 +141,34 @@ La répartition de puissance est représentée sur la carte ci-dessous \footnote
 
 \newpage
 
-Quant au temps de résolution du solver, celui-ci prend en moyenne $1.825 [\mathrm{s}]$ pour renvoyer une solution. Un graphe des performances est représenté ci-dessous :
+Quant au temps de résolution du solver, celui-ci prend en moyenne $1.825$ secondes pour renvoyer une solution. Un graphique des performances est représenté ci-dessous :
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.5]{Images/Partie_1/Q1/execution_time.pdf}
-    \caption{Graphe du temps d'exécution sur 100 itérations}
+    \caption{Graphique du temps d'exécution sur 100 itérations}
     \label{fig:execution_time_partie1}
 \end{figure}
 
 Nous pouvons également nous intéresser à l'énergie totale produite sur l'année ainsi que sur chaque période d'une heure.
 En prenant compte des rendements qui nous ont été fournis et en utilisant la solution obtenue par le solver,
-il est possible de calculer, en chaque heure, l'énergie produite. Le graphe représentant la production d'énergie en fonction du temps est représenté ci-dessous :
+il est possible de calculer, en chaque heure, l'énergie produite. Le graphique représentant la production d'énergie en fonction du temps est représenté ci-dessous :
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.5]{Images/Partie_1/Q1/energy_produced.pdf}
-    \caption{Graphe de la production d'énergie en fonction du temps}
+    \caption{Graphique de la production d'énergie en fonction du temps}
     \label{fig:energy_produced_partie1}
 \end{figure}
 Et en sommant toutes les productions, nous obtenons une valeur d'environ $1828762.56 [\mathrm{GWh}]$. 
 \newpage
 Nous pouvons, de manière similaire, calculer le rendement de production simplement en divisant la production sur une heure par la production idéale (i.e. $P*1\mathrm{h} = P [\mathrm{MWh}]$).\\
-Nous obtenons alors le graphe suivant où nous pouvons observer une moyenne de $42\%$ de rendement :
+Nous obtenons alors le graphique suivant où nous pouvons observer une moyenne de $42\%$ de rendement :
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.5]{Images/Partie_1/Q1/efficiency.pdf}
-    \caption{Graphe du rendement de production en fonction du temps}
+    \caption{graphique du rendement de production en fonction du temps}
     \label{fig:efficiency_partie1}
 \end{figure}
 
@@ -218,26 +218,27 @@ Enfin, bien que cela ne soit pas nécessaire, nous imposons que les quantités d
 \subsection*{B.}
 Nous allons maintenant résoudre ce nouveau problème pour différentes valeurs de $E_{\text{max}}$.\\
 Nous avons décidé de prendre une plage de valeur allant de $0$ à $10^{9} [\mathrm{MWh}]$
-\footnote{Nous avons choisi une telle plage de valeurs pour bien mettre en évidence un changement de comportement dans le graphe d'après.}
+\footnote{Nous avons choisi une telle plage de valeurs pour bien mettre en évidence un changement de comportement dans le graphique d'après et selon la consommation énergétique de l'UE en 2022 qui est d'environ 2.641e9[MWh] c'est une valeur tout à fait réaliste bien que la source de cette production puisse varier, source tirée du  Conseil de l'Union européenne : https://www.consilium.europa.eu/fr/infographics/how-is-eu-electricity-produced-and-sold/, consulté le 17 avril 2024 à 22h14.}
 et nous résolvons le problème par incrément de $10^8 [\mathrm{MWh}]$.\\
-Voici le graphe représentant le minimum de production d'énergie en fonction de la quantité d'énergie achetable :
+Voici le graphique représentant le minimum de production d'énergie en fonction de la quantité d'énergie achetable :
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.5]{Images/Partie_1/Q2/minimal_energy_produced.pdf}
-    \caption{Graphe du minimum de production en fonction de l'énergie maximale achetable}
+    \caption{Graphique du minimum de production en fonction de l'énergie maximale achetable}
     \label{fig:minimal_energy_produced_Q2}
 \end{figure}
 \noindent
 
-Le choix le plus intéressant est en fait l'endroit où la pente est maximale. En effet, en ce point là, acheter une quantité supplémentaire d'énergie amène à une augmentation maximale du minimum de production totale. Le graphe de la pente du graphe ci-dessus est représenté ci-dessous :
+Le choix le plus intéressant est en fait l'endroit où la pente est maximale. En effet, en ce point là, acheter une quantité supplémentaire d'énergie amène à une augmentation maximale du minimum de production totale. Le graphique de la pente du graphique ci-dessus est représenté ci-dessous :
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.5]{Images/Partie_1/Q2/increase_minimal_energy_produced.pdf}
-    \caption{Graphe de la production minimale marginale en fonction de la quantité d'énergie achetable}
+    \caption{Graphique de la production minimale marginale en fonction de la quantité d'énergie achetable}
     \label{fig:increase_minimal_production_Q2}
 \end{figure}
+Pour appuyer sur l'interprétation de ce graphique, il n'y pas un intérêt nul à acheter un autre montant d'énergie, mais à un autre niveau, chaque euro dépensé dans cet achat augmentera moins notre fonction objectif qu'à un autre seuil.
 
 \pagebreak
 
@@ -247,10 +248,10 @@ Nous prenons alors cette valeur pour représenter la production totale (donc en 
 \begin{figure}[ht!]
     \centering
     \includegraphics[scale=0.3]{Images/Partie_1/Q2/energy_produced_and_bought.pdf}
-    \caption{Graphe de la production totale d'énergie pour $E_{\text{max}} = 1e8 [\mathrm{MWh}]$}
+    \caption{Graphique de la production totale d'énergie pour $E_{\text{max}} = 1e8 [\mathrm{MWh}]$}
     \label{fig:total_energy_produced_and_bought_Q2}
 \end{figure}
-Comme nous le voyons sur la figure ci-dessus, la possibilité d'acheter de l'énergie va servir à remonter et à équilibrer les valeurs inférieures de productions d'énergie, d'où le fait que le graphe soit "plat" en-dessous.
+Comme nous le voyons sur la figure ci-dessus, la possibilité d'acheter de l'énergie va servir à remonter et à équilibrer les valeurs inférieures de productions d'énergie, d'où le fait que le graphique soit "plat" en-dessous.
 
 
 \section*{Question 3}
@@ -309,12 +310,12 @@ Après résolution du modèle, nous obtenons une nouvelle répartition de la pui
 
 \newpage
 
-La production totale d'énergie au cours de l'année est de $1957551.15 [\mathrm{GWh}]$, contre $1828762.56 [\mathrm{GWh}]$ pour la question 1. Nous avons comparé la production en fonction du temps avec celle obtenue à la question 1 et nous avons obtenu le graphe suivant :
+La production totale d'énergie au cours de l'année est de $1957551.15 [\mathrm{GWh}]$, contre $1828762.56 [\mathrm{GWh}]$ pour la question 1. Nous avons comparé la production en fonction du temps avec celle obtenue à la question 1 et nous avons obtenu le graphique suivant :
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.5]{Images/Partie_1/Q3/energy_produced_comparison.pdf}
-    \caption{Graphe de la production d'énergie en fonction du temps}
+    \caption{Graphique de la production d'énergie en fonction du temps}
     \label{fig:energy_produced_partie1_Q3}
 \end{figure}
 
@@ -324,7 +325,7 @@ Lorsque nous nous intéressons à la variabilité moyenne de production, nous ob
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.5]{Images/Partie_1/Q3/variability_comparison.pdf}
-    \caption{Graphe de la variabilité de production en fonction du temps}
+    \caption{Graphique de la variabilité de production en fonction du temps}
     \label{fig:variability_comparison_Q3}
 \end{figure}
 
