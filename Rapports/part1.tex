@@ -328,8 +328,16 @@ Lorsque nous nous intéressons à la variabilité moyenne de production, nous ob
     \caption{Graphique de la variabilité de production en fonction du temps}
     \label{fig:variability_comparison_Q3}
 \end{figure}
+En plus du temps d'exécution moyen pour la question 1, nous avons voulu analyser l'influence du nombre de sites sur le temps de résolution de notre programme. Étant donné que c'est une opération assez lourde, nous n'avons exécuté qu'une fois le solver par changement de nombre de sites (tout en adaptant les conditions sur celui-ci afin que le problème d'optimisation reste résoluble), donc les durées enregistrées ne sont pas à priori tout à fait représentatives du temps nécessaire en général, mais arrivent empiriquement à dresser une bonne allure de ce à quoi nous devrions nous attendre.
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{Images/Partie_1/Q3/execution_time_vs_problem_size.pdf}
+    \caption{Graphique du temps d'exécution de \textit{linprog} en fonction du nombre de sites}
+    \label{fig:execution_time_vs_problem_size_Q3}
+\end{figure}
 \newpage
+Le résultat que nous observons semble assez cohérent, le solver semble ne pas subir une croissance plus que linéaire en fonction du nombre de sites (cela aurait été sûrement un cas similaire si nous avions fait varier le nombre d'heures (8760) au lieu des sites). Pourtant, rajouter énormément de variables pour une résolution à la main aurait probablement complexifié la chose plus que linéairement, chose qui montre que \textit{linprog} se comporte assez bien, intuitivement. Cela reste cependant assez peu d'informations pour juger de la qualité du solver, mais en tout cas, pour ce problème, et ce nombre de variables, il ne semble pas prendre un temps exponentiel de résolution, ce qui nous est utile.
 
 \section*{Conclusion}
 Voici un tableau récapitulatif reprenant les caractéristiques de chacun des trois modèles présentés dans cette première partie du projet :
@@ -337,7 +345,7 @@ Voici un tableau récapitulatif reprenant les caractéristiques de chacun des tr
     \begin{tabular}{c| c c c }
         Caractéristiques & Question 1 & Question 2 & Question 3\\
         \hline
-        Nombre de sites non nulles & 267 & 267 & 312\\
+        Nombre de sites avec productions non nulles & 267 & 267 & 312\\
         Production totale d'énergie $[\mathrm{GWh}]$& $1828762.56$ & $2035764.02$ & $1957551.15$\\
         Minimum de production $[\mathrm{MWh}]$ & $108249.48$ & $203397.45$ & $77793.64$\\
         Maximum de production $[\mathrm{MWh}]$ & $319059.43$ & $332235.91$ & $348449.77$\\
@@ -348,7 +356,7 @@ Voici un tableau récapitulatif reprenant les caractéristiques de chacun des tr
 
 \medskip
 Bien que le modèle de la question 3 avait pour but de limiter la variabilité moyenne de production, nous observons que celle-ci est plus élevée que pour les modèles des question 1 et 2. Cela est dû au fait que le modèle de la question 3 cherche à maximiser la production totale d'énergie, ce qui peut amener à des différences élevées entre les maximums et minimums de productions.\\
-Nous voyons cependant bien les différences de comportement entre les trois modèles quant aux minimums et maximums de production d'énergie. Le modèle de la question 2 permet d'obtenir un minimum de production plus élevé que les deux autres modèles car l'objectif est de maximiser ce minimum avec la possibilité d'acheter de l'énergie. Le modèle de la question 3 permet d'obtenir une production totale d'énergie plus élevée que le modèle de la question 1 et 2 car l'objectif est de maximiser cette production totale.\\
+Nous voyons cependant bien les différences de comportement entre les trois modèles quant aux minima et maxima de production d'énergie. Le modèle de la question 2 permet d'obtenir un minimum de production plus élevé que les deux autres modèles  car l'objectif est de maximiser ce minimum avec la possibilité d'acheter de l'énergie. Le modèle de la question 3 permet d'obtenir une production totale d'énergie plus élevée que le modèle de la question 1 et 2 (sans compter la possibilité d'achat) car l'objectif est de maximiser cette production totale.\\
 
 
 \end{document} 
