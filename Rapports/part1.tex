@@ -110,8 +110,8 @@ La contrainte (1) représente la puissance totale qu'il faut installer en Europe
 
 \subsubsection*{Estimation de la taille du modèle}
 \noindent
-Au total, nous avons $\overbrace{n}^{c_i} + \overbrace{1}^{\gamma}$
-variables et $\overbrace{m}^{\text{(3)}} + \overbrace{2}^{\text{(1) \& (2)}}$ contraintes \textbf{en plus} des "$2n$" contraintes par rapport aux bornes sur les $c_i$.\\
+Au total, nous avons $n + 1$
+variables et $m + 2$ contraintes \textbf{en plus} des "$2n$" contraintes par rapport aux bornes sur les $c_i$.\\
 Cependant, lors de la résolution le \textit{solver} traduit le problème sous forme standard. Ainsi, il introduit $n + m$ variables de \textit{slack} qui correspondent au contraintes (3) et (4). Nous nous retrouvons alors avec le problème suivant : 
 \begin{align*}
     \max_{c_i, \gamma, s_j, t_i} \quad  
