@@ -46,11 +46,8 @@
 
 \begin{document}
 
-\input{page_guard}
 
-\section*{Question 1}
-
-\subsection*{A.}
+\section*{Question 1A}
 \subsubsection*{Modélisation du problème}
 Afin de garantir que le niveau de production ne soit pas trop bas, il nous a été demandé de maximiser le niveau minimal de production au cours de l'année. Nous allons discuter dans cette section de notre choix de modélisation pour ce problème.\\
 Vous trouverez ci-dessous une table regroupant les notations utilisées dans notre modèle \footnote{Bien que $n$ et $m$ soient des constantes, nous utilisons ces notations pour alléger les formules et également pour rester dans un cadre général. Tout autre paramètre/variable sera introduit lorsque cela sera nécessaire.}:
@@ -126,8 +123,8 @@ Cependant, lors de la résolution le \textit{solver} traduit le problème sous f
     c_i, \gamma, s_j, t_i &\ge 0
 \end{align*}
 Ce qui mène à un total de $2n + m + 1$ variables et $m + n + 2$ contraintes.
-
-\subsection*{B.}
+\newpage
+\subsection*{Question 1B}
 Pour résoudre le modèle décrit dans la section précédente, nous avons utilisé la fonction \verb|linprog| de la librairie \verb|SciPy|.\\
 La solution retournée par le solver pour les paramètres $P = 500000 [\mathrm{MW}]$ et $\kappa = 0.17$ nous indique qu'il y a $267$ sites sur lesquels la puissance installée est non nulle, ce qui veut dire qu'il y a $642 - 267 = 375$ sites sur lesquels il est préférable de ne pas installer d'éoliennes.\\
 La répartition de puissance est représentée sur la carte ci-dessous \footnote{Les croix représentent les sites sur lesquels la puissance installée est nulle.} :
@@ -169,9 +166,9 @@ Nous obtenons alors le graphique suivant où nous pouvons observer une moyenne d
     \caption{graphique du rendement de production en fonction du temps}
     \label{fig:efficiency_partie1}
 \end{figure}
-
-\subsection*{C.}
-\subsubsection*{(a)}
+\newpage
+\section*{Question 1C}
+\subsection*{(a)}
 Nous avons vu au cours que les variables du problème dual associé au primal permettent de calculer la variation de la fonction objectif
 lorsque l'on modifie la valeur d'une des contraintes. Lorsque l'on change la valeur de la puissance maximale installable de $P$ à $\Delta P$, la variable $y_1$ du problème dual nous indiquera de combien change
 la fonction objectif (i.e. la valeur de production minimale). Nous avons donc :
@@ -179,20 +176,18 @@ la fonction objectif (i.e. la valeur de production minimale). Nous avons donc :
     \Delta \gamma = y_1 \Delta P
 \end{equation*}
 
-\subsubsection*{(b)}
+\subsection*{(b)}
 Pour déterminer les sites les plus rentables sur lesquels on augmenterait la capacité dans le cas d'une modification de la puissance maximale installable, il suffit de regarder les variables duales associées aux contraintes de capacité maximale installable. En effet, ces variables nous indiquent de combien la fonction objectif varie lorsque l'on modifie la capacité maximale installable d'un site.
 Nous pouvons donc résoudre le problème dual associé au primal pour obtenir ces valeurs. Après résolution, nous obtenons que les dix sites les plus intéressants sont les sites $\{241, 296, 311, 312, 313, 314, 315, 330, 434, 437\}$.\\
 Cependant, lorsque nous regardons les sites où le rendement moyen est maximal, nous obtenons : $$\{ 69, 166, 167, 235, 236, 237, 434, 447, 525, 623 \}$$
 Nous voyons donc que, sauf exception, il n'y pas de lien entre les sites les plus rentables quant à l'augmentation de la puissance installable et ceux où le rendement est maximal.
-
-\section*{Question 2}
-
-\subsection*{A.}
+\newpage
+\section*{Question 2A}
 Dans cette deuxième question, nous avons maintenant la possibilité
 d'acheter de l'énergie en chaque heure en plus de l'énergie produite par les éoliennes.
 Toutefois, nous pouvons acheter qu'une quantité maximale $E_{\text{max}}$ d'énergie.\\
 
-\subsubsection*{Modélisation du nouveau problème}
+\subsection*{Modélisation du nouveau problème}
 Pour représenter l'achat d'énergie en chaque heure de l'année, nous pouvons introduire $m$ nouvelles variables $a_j$ pour $j \in \{ 0, \ldots, m-1 \}$.\\
 Notre nouveau vecteur de variables de décisions devient alors : 
 \[ \bm{x} = (c_0, \ldots, c_{n-1}, a_0, \ldots, a_{m-1}, \gamma )^\intercal \]
@@ -210,9 +205,8 @@ Où nous prenons également compte de l'énergie achetée en chaque heure dans l
 De plus, une contrainte supplémentaire vient s'ajouter pour limiter la quantité totale d'énergie achetée. La somme des énergies achetées en chaque heure doit être inférieure à $E_{\text{max}}$ (4\textsuperscript{e} contrainte).\\
 Enfin, bien que cela ne soit pas nécessaire, nous imposons que les quantités d'énergies achetées en chaque heure soient positives.
 
-\pagebreak
-
-\subsection*{B.}
+\newpage
+\subsection*{Question 2B}
 Nous allons maintenant résoudre ce nouveau problème pour différentes valeurs de $E_{\text{max}}$.\\
 Nous avons décidé de prendre une plage de valeur allant de $0$ à $10^{9} [\mathrm{MWh}]$
 \footnote{Nous avons choisi une telle plage de valeurs pour bien mettre en évidence un changement de comportement dans le graphique d'après et selon la consommation énergétique de l'UE en 2022 qui est d'environ 2.641e9[MWh] c'est une valeur tout à fait réaliste bien que la source de cette production puisse varier, source tirée du  Conseil de l'Union européenne : https://www.consilium.europa.eu/fr/infographics/how-is-eu-electricity-produced-and-sold/, consulté le 17 avril 2024 à 22h14.}
@@ -250,10 +244,9 @@ Nous prenons alors cette valeur pour représenter la production totale (donc en 
 \end{figure}
 Comme nous le voyons sur la figure ci-dessus, la possibilité d'acheter de l'énergie va servir à remonter et à équilibrer les valeurs inférieures de productions d'énergie, d'où le fait que le graphique soit "plat" en-dessous.
 
+\newpage
+\section*{Question 3A}
 
-\section*{Question 3}
-
-\subsection*{A.}
 Nous souhaitons à présent maximiser la production totale d'énergie sur l'année tout en respectant les mêmes contraintes qu'à la question 1 quant à la puissance totale et en offshore à installer.\\
 Toutefois, nous souhaitons limiter la variabilité moyenne de la production d'énergie sur l'année à une valeur inférieure à $\delta P T$ où $\delta$ représente une proportion de l'énergie maximale productible sur une période de $T [h]$. Le modèle s'écrit alors :
 
@@ -272,7 +265,7 @@ où nous avons défini pour tout $k \in \{ 0, \ldots, \frac{m}{T} - 2 \}$ :
     \epsilon_k &= \sum_{j = kT}^{(k+1)T - 1} \sum_{i = 0}^{n-1} c_i e_i(t_j) = \sum_{i=0}^{n-1} c_i \sum_{j = kT}^{(k+1)T - 1} e_i(t_j)\\
     \Delta_k &= | \epsilon_{k+1} - \epsilon_k |
 \end{align*}
-
+Et où nous supposons que m soit divisible par T, ce qui est respecté par les valeurs numériques fournies pour la résolution, si m n'était pas divisible par T, il suffirait de modifier légèrement le modèle pour qu'un intervalle soit d'une taille différente, mais cela ne changerait pratiquement rien à la formalisation.
 Les valeurs absolues se trouvant dans les contraintes posent problèmes car celles-ci ne sont pas linéaires. Cependant, nous pouvons imposer deux contraintes supplémentaires pour chaque $\Delta_k$ afin de les rendre linéaires :
 
 \begin{align*}
@@ -281,7 +274,6 @@ Les valeurs absolues se trouvant dans les contraintes posent problèmes car cell
 \end{align*}
 
 Nous avons alors :
-
 \begin{align*}
     \max_{c_i, \Delta_k} \quad  
     &\sum_{i=0}^{n-1} c_i \sum_{j = 0}^{m - 1} e_i(t_j) \\ 
@@ -294,8 +286,8 @@ Nous avons alors :
 \end{align*}
 
 où nous avons reformulé la fonction objectif en mettant en évidence les $c_i$.
-
-\subsection*{B.}
+\newpage
+\section*{Question 3B}
 Après résolution du modèle, nous obtenons une nouvelle répartition de la puissance installée. Cette fois-ci, nous avons 312 sites sur lesquels la puissance installée est non nulle. La répartition est représentée sur la carte ci-dessous :
 
 \begin{figure*}[h!]
@@ -304,8 +296,6 @@ Après résolution du modèle, nous obtenons une nouvelle répartition de la pui
     \caption{Carte représentant la répartition de puissance sur les différents sites d'éoliennes}
     \label{fig:capacity_distribution_partie1_Q3}
 \end{figure*}
-
-\newpage
 
 La production totale d'énergie au cours de l'année est de $1957551.15 [\mathrm{GWh}]$, contre $1828762.56 [\mathrm{GWh}]$ pour la question 1. Nous avons comparé la production en fonction du temps avec celle obtenue à la question 1 et nous avons obtenu le graphique suivant :
 
@@ -333,10 +323,9 @@ En plus du temps d'exécution moyen pour la question 1, nous avons voulu analyse
     \caption{Graphique du temps d'exécution de \textit{linprog} en fonction du nombre de sites}
     \label{fig:execution_time_vs_problem_size_Q3}
 \end{figure}
-\newpage
 Le résultat que nous observons semble assez cohérent, le solver semble ne pas subir une croissance plus que linéaire en fonction du nombre de sites (cela aurait été sûrement un cas similaire si nous avions fait varier le nombre d'heures (8760) au lieu des sites). Pourtant, rajouter énormément de variables pour une résolution à la main aurait probablement complexifié la chose plus que linéairement, chose qui montre que \textit{linprog} se comporte assez bien, intuitivement. Cela reste cependant assez peu d'informations pour juger de la qualité du solver, mais en tout cas, pour ce problème, et ce nombre de variables, il ne semble pas prendre un temps exponentiel de résolution, ce qui nous est utile.
 
-\section*{Conclusion}
+\subsection*{Conclusion}
 Voici un tableau récapitulatif reprenant les caractéristiques de chacun des trois modèles présentés dans cette première partie du projet :
 \begin{center}
     \begin{tabular}{c| c c c }
@@ -355,5 +344,24 @@ Voici un tableau récapitulatif reprenant les caractéristiques de chacun des tr
 Bien que le modèle de la question 3 avait pour but de limiter la variabilité moyenne de production, nous observons que celle-ci est plus élevée que pour les modèles des question 1 et 2. Cela est dû au fait que le modèle de la question 3 cherche à maximiser la production totale d'énergie, ce qui peut amener à des différences élevées entre les maximums et minimums de productions.\\
 Nous voyons cependant bien les différences de comportement entre les trois modèles quant aux minima et maxima de production d'énergie. Le modèle de la question 2 permet d'obtenir un minimum de production plus élevé que les deux autres modèles  car l'objectif est de maximiser ce minimum avec la possibilité d'acheter de l'énergie. Le modèle de la question 3 permet d'obtenir une production totale d'énergie plus élevée que le modèle de la question 1 et 2 (sans compter la possibilité d'achat) car l'objectif est de maximiser cette production totale.\\
 
+\newpage
+\thispagestyle{empty}
+\section*{Contributions au projet du groupe 49}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|p{6cm}|}
+        \hline
+        \textbf{Nom} & \textbf{Noma} & \textbf{Contribution} \\
+        \hline
+        AHOU Lucas & 3594-22-00 & Réponse aux questions et rédaction principale du fichier \LaTeX \\
+        \hline
+        AHOU Samuel & 4408-19-00 & Utilisation des paquets afin de générer les graphiques contenant les cartes et réponses aux questions \\
+        \hline
+        FIORINI Lucien & 7502-22-00 & Formalisation mathématique et relecture du code \\
+        \hline
+        PORTIER Adrien & 5337-22-00 & Écriture du code du notebook et formalisation mathématique \\
+        \hline
+    \end{tabular}
+\end{table}
 
 \end{document} 
