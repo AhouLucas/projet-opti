@@ -139,9 +139,8 @@ La répartition de puissance est représentée sur la carte ci-dessous \footnote
     \label{fig:capacity_distribution_partie1}
 \end{figure}
 
-\newpage
 
-Quant au temps de résolution du solver, celui-ci prend en moyenne $1.825$ secondes pour renvoyer une solution. Un graphique des performances est représenté ci-dessous :
+Quant au temps de résolution du solver, celui-ci prend en moyenne $\approx 1.8$ secondes pour renvoyer une solution. Un graphique des performances est représenté ci-dessous :
 
 \begin{figure}[h!]
     \centering
@@ -160,8 +159,7 @@ il est possible de calculer, en chaque heure, l'énergie produite. Le graphique 
     \caption{Graphique de la production d'énergie en fonction du temps}
     \label{fig:energy_produced_partie1}
 \end{figure}
-Et en sommant toutes les productions, nous obtenons une valeur d'environ $1828762.56 [\mathrm{GWh}]$. 
-\newpage
+Et en sommant toutes les productions, nous obtenons une valeur d'environ $1828762.56 [\mathrm{GWh}]$.\\
 Nous pouvons, de manière similaire, calculer le rendement de production simplement en divisant la production sur une heure par la production idéale (i.e. $P*1\mathrm{h} = P [\mathrm{MWh}]$).\\
 Nous obtenons alors le graphique suivant où nous pouvons observer une moyenne de $42\%$ de rendement :
 
@@ -186,7 +184,6 @@ Pour déterminer les sites les plus rentables sur lesquels on augmenterait la ca
 Nous pouvons donc résoudre le problème dual associé au primal pour obtenir ces valeurs. Après résolution, nous obtenons que les dix sites les plus intéressants sont les sites $\{241, 296, 311, 312, 313, 314, 315, 330, 434, 437\}$.\\
 Cependant, lorsque nous regardons les sites où le rendement moyen est maximal, nous obtenons : $$\{ 69, 166, 167, 235, 236, 237, 434, 447, 525, 623 \}$$
 Nous voyons donc que, sauf exception, il n'y pas de lien entre les sites les plus rentables quant à l'augmentation de la puissance installable et ceux où le rendement est maximal.
-\newpage
 
 \section*{Question 2}
 
@@ -258,7 +255,7 @@ Comme nous le voyons sur la figure ci-dessus, la possibilité d'acheter de l'én
 
 \subsection*{A.}
 Nous souhaitons à présent maximiser la production totale d'énergie sur l'année tout en respectant les mêmes contraintes qu'à la question 1 quant à la puissance totale et en offshore à installer.\\
-Toutefois, nous souhaitons limiter la variabilité moyenne de la production d'énergie sur l'année à une valeur inférieure à $\delta P T$ où $\delta$ représente une une proportion de l'énergie maximale productible sur une période de $T [h]$. Le modèle s'écrit alors :
+Toutefois, nous souhaitons limiter la variabilité moyenne de la production d'énergie sur l'année à une valeur inférieure à $\delta P T$ où $\delta$ représente une proportion de l'énergie maximale productible sur une période de $T [h]$. Le modèle s'écrit alors :
 
 \begin{align*}
     \max_{c_i} \quad  
