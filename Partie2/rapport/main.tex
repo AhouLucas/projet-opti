@@ -1,0 +1,82 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{pdfpages}
+\usepackage{graphicx}
+\usepackage{mathtools}
+
+\usepackage[hidelinks]{hyperref}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{Ahou L. -  Ahou S. - Fiorini L. - Portier A.} % controls the left corner of the header
+\chead{} % controls the center of the header
+\rhead{Groupe 49} % controls the right corner of the header
+\lfoot{} % controls the left corner of the footer
+\cfoot{} % controls the center of the footer
+\cfoot{~\thepage} % controls the right corner of the footer
+\usepackage{titlesec}
+
+% Commands for physic unit
+\newcommand{\unit}[1]{[\mathrm{#1}]}
+
+\begin{document}
+
+\section*{Question 4A}
+Puisque nous nous intéressons seulement aux bilans de productions/consommations et du niveau du bassin
+sur des périodes de $T \unit{h}$, nous pouvons exprimer toutes nos variables en fonction de cette période.\\
+Voici un tableau reprenant les notations principales utilisées dans cette seconde partie \footnote{Toutes autres notations utilisées dans la suite seront définies lorsque celles-ci seront introduites} : 
+
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.5}% Add spacing between rows : default value is 1
+    \begin{tabular}{|c || c |} 
+        \hline
+        Nom & Signification\\
+        \hline\hline
+        $n$ & Nombre de sites d'éoliennes\\
+        $m$ & Nombre de périodes de $T \unit{h}$ dans une année\\
+        $c_i$ & Capacité éolienne installée sur le i\textsuperscript{ème} site\\
+        $e_i(j)$ & Somme des rendements éoliens du i\textsuperscript{ème} site durant la j\textsuperscript{ème} période\\
+        $t_j$ & Puissance de turbinage durant la j\textsuperscript{ème} période\\
+        $p_j$ & Puissance de pompage durant la j\textsuperscript{ème} période\\
+        $a_j$ & Apport fluvial durant la j\textsuperscript{ème} période\\
+        $\mathrm{cons}_j$ & Consommation énergétique durant la j\textsuperscript{ème} période\\
+        $t_\mathrm{max}$ & Capacité maximale de turbinage\\
+        $p_\mathrm{max}$ & Capacité maximale de pompage\\
+        $\mathrm{stock}_\mathrm{max}$ & Capacité de stockage maximale\\
+        $\eta$ & Rendement de turbinage\\
+        \hline
+    \end{tabular}
+    \caption{Table des notations utilisées pour le modèle}
+    \label{table:notations}
+\end{table}
+
+\noindent
+Le modèle peut alors s'écrire ainsi :
+
+\begin{align}
+    \min \quad &\mathrm{costs}^\intercal\mathbf{c} \nonumber\\
+    & \sum_{i=0}^{n-1} c_i e_i(j) + \eta \cdot t_j - p_j \ge \mathrm{cons}_j \quad \forall j \{ 0, \ldots, m-1 \}\label{eq:4A_contr1}\\
+    & -\frac{\mathrm{stock}_\mathrm{max}}{2} \le \sum_{j=0}^{k} p_j - t_j + a_j \le  +\frac{\mathrm{stock}_\mathrm{max}}{2} \quad \forall k \in \{ 0, \ldots, m-2 \}\label{eq:4A_contr2}\\
+    & \sum_{j=0}^{m-1} p_j - t_j + a_j = 0 \label{eq:4A_contr3}\\
+    & 0 \le c_i \le c_i^\mathrm{max} \label{eq:4A_contr4}\\
+    & 0 \le t_j \le T \cdot t_\mathrm{max} \label{eq:4A_contr5}\\
+    & 0 \le p_j \le T \cdot p_\mathrm{max} \label{eq:4A_contr6}
+\end{align}
+
+\newpage
+
+La fonction objectif représente le coût d'installation des éoliennes (en tenant compte des différences entre les installations \textit{offshore} et \textit{onshore}). 
+Cela revient au même que de minimiser le prix moyen de l'énergie consomée car il suffit de diviser le coût total de l'installation par la demande totale en énergie qui est une constante.\\
+La contrainte \eqref{eq:4A_contr1} indique qu'il faut satisfaire la demande en énergie en fin de chaque période de $T \unit{h}$ en tenant compte de la production éolienne
+ainsi que des opérations de turbinage/pompage.\\
+La contrainte \eqref{eq:4A_contr2} fait le bilan des opérations de turbinage/pompage et de l'apport fluvial depuis le temps $t = 0$ jusqu'en tout temps $t = k$ afin de calculer l'augmentation/la diminution du niveau de l'eau dans le bassin.\\
+Puisque le niveau initial du bassin est de $0.5 \times \mathrm{stock}_\mathrm{max}$, ce bilan ne peut dépasser les bornes spécifiées dans la contrainte.\\
+La contrainte \eqref{eq:4A_contr3} indique que le niveau final du bassin doit revenir au même niveau qu'initialement. Autrement dit, les opérations de turbinage/pompage et l'apport fluvial doivent se sommer à 0 à la fin de la dernière période.\\
+Les contraintes \eqref{eq:4A_contr4}, \eqref{eq:4A_contr5} et \eqref{eq:4A_contr6} indiquent respectivement les bornes sur les capacités éoliennes maximales installables sur chaque site, 
+les capacités maximales de turbinages et les capacités maximales de pompages pour des périodes de $T \unit{h}$.
+
+\end{document}
