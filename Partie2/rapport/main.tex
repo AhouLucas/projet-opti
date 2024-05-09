@@ -41,8 +41,8 @@ Voici deux tableaux reprenant les notations principales utilisées dans cette se
         $p_j$ & Puissance de pompage choisie durant la j\textsuperscript{ème} période\\
         \hline
     \end{tabular}
-    \caption{Table des notations des variables de décisions utilisées pour le modèle}
-    \label{table:notations_variables}
+    \caption{Table des notations des variables de décisions utilisées pour le modèle de la question 4.}
+    \label{table:notations_variables_4}
 \end{table}
 
 \begin{table}[h!]
@@ -64,20 +64,20 @@ Voici deux tableaux reprenant les notations principales utilisées dans cette se
         $\mathrm{costs}$ & Vecteur donnant les valeurs du coût d'installation d'un site éolien  (onshore/offshore) \newline $\mathrm{costs}_i = $ Coût d'installation d'un site onshore si le site d'index $i$ est onshore, et inversement.\\  
         \hline
     \end{tabular}
-    \caption{Table des notations des constantes utilisées pour le modèle}
+    \caption{Table des notations des constantes utilisées pour le modèle.}
     \label{table:notations_constantes}
 \end{table}
 
 \noindent
 Le modèle peut alors s'écrire ainsi :
 \begin{align}
-    \min_{c,t,p} \quad &\mathrm{costs}^\intercal\mathbf{c} \nonumber\\
+    \min_{c_{i},t_j,p_j} \quad &\mathrm{costs}^\intercal\mathbf{c} \nonumber\\
     \textrm{tel que} \quad & \sum_{i=0}^{n-1} c_i e_i(j) + \eta \cdot t_j - p_j \ge \mathrm{cons}_j \quad \forall j \in  \{ 0, \ldots, m-1 \}\label{eq:4A_contr1}\\
     & 0 \le \frac{\mathrm{stock}_\mathrm{max}}{2}  + \sum_{j=0}^{k} p_j - t_j + a_j \le  \mathrm{stock}_\mathrm{max} \quad \forall k \in \{ 0, \ldots, m-2 \}\label{eq:4A_contr2}\\
     & \sum_{j=0}^{m-1} p_j - t_j + a_j = 0 \label{eq:4A_contr3}\\
-    & 0 \le c_i \le c_i^\mathrm{max} \label{eq:4A_contr4}\\
-    & 0 \le t_j \le T \cdot t_\mathrm{max} \label{eq:4A_contr5}\\
-    & 0 \le p_j \le T \cdot p_\mathrm{max} \label{eq:4A_contr6}
+    & 0 \le c_i \le c_i^\mathrm{max} \quad \forall i \in  \{ 0, \ldots, n-1 \}  \label{eq:4A_contr4}\\
+    & 0 \le t_j \le T \cdot t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \}  \label{eq:4A_contr5}\\
+    & 0 \le p_j \le T \cdot p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4A_contr6}
 \end{align}
 
 \newpage
@@ -127,6 +127,54 @@ consulté le 8 mai 2024 à 01h08.}.
     \caption{Test}
     \label{fig:Prod_Cons_Q4}
 \end{figure}
+
+
+\clearpage
+\section*{Question 4C}
+
+\newpage
+\section*{Question 5}
+Pour résoudre ce problème, il faut introduire de nouvelles variables indiquant si nous avons installé
+100\%, 50\% ou 0\% de la capacité maximale, sur un site donné, nous pouvons voir ça comme l'initialisation
+de 3 variables booléennes, chacune indiquant si la proportion de sa capacité maximale a été installée,
+typiquement nous pouvons avoir un ensemble de variables $a,b,c \in \{ 0,1\}$ tel que $a + b + c = 1$, c'est-à
+-dire que nous ne pourrions avoir que les configurations $(a,b,c) = (1,0,0)$ pour une capacité choisie de (100\%), (0,1,0) pour (50\%) et (0,0,1) pour (0\%), 
+qui vérifient notre condition. En introduisant les 3 variables binaires pour chaque site, nous avons alors les variables suivantes.
+
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.5}% Add spacing between rows : default value is 1
+    \begin{tabular}{|c || p{14cm} |} 
+        \hline
+        Nom & Signification\\
+        \hline\hline
+        $c_{ij}$ & Capacité éolienne installée (soit j = 0 alors 100\%, soit j = 1 alors 50\% ou soit j = 2 alors 0\%)
+        sur le i\textsuperscript{ème} site \\
+        $t_j$ & Puissance de turbinage choisie durant la j\textsuperscript{ème} période\\
+        $p_j$ & Puissance de pompage choisie durant la j\textsuperscript{ème} période\\
+        \hline
+    \end{tabular}
+    \caption{Table des notations des variables de décisions utilisées pour le modèle de la question 5.}
+    \label{table:notations_variables_5}
+\end{table} 
+\noindent Pour faire le rapprochement avec le modèle de notre question 4, vu que notre variable $c_i$ de cette question parcourait
+les valeurs de 0 à $c_i^{max}$, nous pouvons logiquement remplacer la variable $c_i$ de ce modèle 
+par $1 c_i^{max} c_{i0} + \frac{c_i^{max}}{2}c_{i1} + 0 c_i^{max} c_{i2}$, qui vaudrait bien une de nos 
+trois valeurs sélectionnées car il n'y aura qu'une variable non nulle. \\
+Le modèle peut alors s'écrire ainsi :
+\begin{align}
+    \min_{c_{ij},t_j,p_j} \quad &\mathrm{costs}^\intercal \begin{pmatrix}
+        c_0^{max} c_{00} + \frac{c_0^{max}}{2}c_{01} \\
+        \vdots \\
+        c_{(n-1)}^{max} c_{(n-1)0} + \frac{c_{(n-1)}^{max}}{2}c_{(n-1)1}
+    \end{pmatrix} \nonumber\\
+    \textrm{tel que} \quad & \sum_{i=0}^{n-1} (c_i^{max} c_{i0} + \frac{c_i^{max}}{2}c_{i1}) e_i(j) + \eta \cdot t_j - p_j \ge \mathrm{cons}_j \quad \forall j \in  \{ 0, \ldots, m-1 \}\label{eq:5_contr1}\\
+    & 0 \le \frac{\mathrm{stock}_\mathrm{max}}{2}  + \sum_{j=0}^{k} p_j - t_j + a_j \le  \mathrm{stock}_\mathrm{max} \quad \forall k \in \{ 0, \ldots, m-2 \}\label{eq:5_contr2}\\
+    & \sum_{j=0}^{m-1} p_j - t_j + a_j = 0 \label{eq:5_contr3}\\
+    & c_{i0} + c_{i1} + c_{i2} = 1 \quad \forall i \in  \{ 0, \ldots, n-1 \} \label{eq:5_contr4}  \\
+    & 0 \le t_j \le T \cdot t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:5_contr5}\\
+    & 0 \le p_j \le T \cdot p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:5_contr6} 
+\end{align}
 
 
 \end{document}
