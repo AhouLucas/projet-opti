@@ -1,4 +1,8 @@
 \documentclass{article}
+% chktex-file 44
+% chktex-file 8
+% chktex-file 18
+% chktex-file 35
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -254,5 +258,47 @@ Dans ce graphique, la production est beaucoup plus proche de la consommation par
 obligé d'aller puiser au maximum pour éviter le gaspillage d'un surplus de production.
 \noindent 
 
+\newpage
+
+\section*{Question 6}
+Pour ce dernier modèle, nous avons également la possibilité d'installer des centrales à gaz, qui peuvent être utilisées pour produire de l'électricité en cas de besoin.
+La puissance totale à insaller fait partie des variables de décision, ainsi que l'énergie produite par ces centrales en chaque période de $T \unit{h}$.\\
+Nous avons donc les nouvelles variables suivantes :
+
+\begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.5}% Add spacing between rows : default value is 1
+    \begin{tabular}{|c || c |} 
+        \hline
+        Nom & Signification\\
+        \hline\hline
+        $c_i$ & Capacité éolienne installée sur le i\textsuperscript{ème} site\\
+        $t_j$ & Puissance à envoyer en turbinage choisie durant la j\textsuperscript{ème} période\\
+        $p_j$ & Puissance de pompage choisie durant la j\textsuperscript{ème} période\\
+        $g_\mathrm{tot}$ & Puissance totale à installer pour les centrales à gaz\\
+        $g_j$ & \'Energie produite par les centrales à gaz durant la j\textsuperscript{ème} période\\
+        \hline
+    \end{tabular}
+    \caption{Table des notations des variables de décisions utilisées pour le modèle de la question 4.} 
+    \label{table:notations_variables_6}
+\end{table}
+
+\noindent Nous devons alors prendre en compte, en plus du coût d'installation des éoliennes, le coût d'installation des centrales à gaz ainsi que leur coût de fonctionnement.
+Le modèle devient alors :
+
+\begin{align}
+    \min_{c_{i},t_j,p_j} \quad &\mathrm{costs}^\intercal\mathbf{c} + \mathrm{gas\_prod\_cost}\cdot \sum_{j=0}^{m-1} g_j + \mathrm{gas\_install\_cost} \cdot g_\mathrm{tot}\nonumber\\
+    \textrm{tel que} \quad & \sum_{i=0}^{n-1} c_i e_i(j) + g_j + \eta \cdot t_j - p_j \ge \mathrm{cons}_j \quad \forall j \in  \{ 0, \ldots, m-1 \}\label{eq:6_contr1}\\
+    & 0 \le \frac{\mathrm{stock}_\mathrm{max}}{2}  + \sum_{j=0}^{k} p_j - t_j + a_j \le  \mathrm{stock}_\mathrm{max} \quad \forall k \in \{ 0, \ldots, m-2 \}\label{eq:6_contr2}\\
+    & \sum_{j=0}^{m-1} p_j - t_j + a_j = 0 \label{eq:6_contr3}\\
+    & 0 \le c_i \le c_i^\mathrm{max} \quad \forall i \in  \{ 0, \ldots, n-1 \}  \label{eq:6_contr4}\\
+    & 0 \le \eta \cdot t_j \le  t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \}  \label{eq:6_contr5}\\
+    & 0 \le p_j \le  p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:6_contr6}\\
+    & 0 \le g_j \le g_\mathrm{tot} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:6_contr7}
+\end{align}
+
+\noindent où $\mathrm{gas\_prod\_cost}$ est le coût de production d'énergie par les centrales à gaz et $\mathrm{gas\_install\_cost}$ est le coût d'installation des centrales à gaz.\\
+La fonction objectif tient maintenant compte du coût d'installation et de production des centrales à gaz. La contrainte \eqref{eq:6_contr1} est modifiée pour prendre en compte la production d'énergie par les centrales à gaz dans le bilan total de production. 
+Enfin, une dernière contrainte \eqref{eq:6_contr7} est ajoutée pour limiter la production d'énergie par les centrales à gaz à la puissance totale installée.
 
 \end{document}
