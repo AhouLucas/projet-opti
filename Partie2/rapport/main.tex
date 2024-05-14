@@ -12,6 +12,7 @@
 \usepackage{mathtools}
 \usepackage{eurosym}
 \usepackage[hidelinks]{hyperref}
+\usepackage{float}
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -109,37 +110,17 @@ assez libre et qui ne prétend pas refléter les réalités, le prix moyen de l'
 est aux alentours de quelques centaines d'euros, d'après la Commission européenne : 
 \url{https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Electricity_price_statistics}, 
 consulté le 8 mai 2024 à 01h08.} Nous avons implémenté ce problème avec la bibliothèque CVXPY qui a été recommandée, cependant
-il y a plusieurs solvers disponibles et ils donnent pour ceux qui ont été testé, des résultats différents qui arrivent presque à
-la même valeur de fonction objectif, la différence étant sûrement due aux erreurs de calcul numérique. Nous vous présentons des résultats 
-en fonction des solvers étant relativement efficaces, bien qu'il y en ait plus pour la programmation linéaire. Pour cette résolution,
-nous avons utilisé "PDLP" (la liste des solvers étant disponible ici : \url{https://www.cvxpy.org/tutorial/solvers/index.html}).
-
-\begin{table}[h!]
-    \centering
-    \renewcommand{\arraystretch}{1.5}% Add spacing between rows : default value is 1
-    \begin{tabular}{| c | c | c |} 
-        \hline
-        Solver & Temps de calcul & Coût total (Valeur de la fonction objectif) \\
-        \hline
-        PDLP & 3 minutes et 37.5 secondes & 150960698186.38720 \\
-        SCIPY & 36.5 secondes & 150961169167.04733 \\
-        \hline
-    \end{tabular}
-    \caption{Table comparative des solvers employés pour la résolution du modèle de la question 4 en fonction de leurs temps de calcul
-    et du résultat renvoyé.}
-    \label{table:comparaison_solver_Q4}
-\end{table}
-\noindent
-Bien que SCIPY est plus rapide à nous fournir le résultat, nous trouvions que le choix des paramètres était moins bien représentable
-graphiquement, mais cela aurait été une autre solution tout aussi efficace (à priori, en faisant l'hypothèse que les deux résultats de la fonction objectif 
-sont sensiblement similaires). Nous n'avons pas fait de moyenne sur le temps de calcul mais 
-ils semblent bien se comporter, il s'agit plus d'un ordre de grandeur que d'une valeur précise d'efficacité.
+il y a plusieurs solvers disponibles et ils donnent pour ceux qui ont été testé, des résultats différents (pour le choix des valeurs de décision) mais qui arrivent presque à
+la même valeur de fonction objectif, la différence étant sûrement due aux erreurs de calcul numérique. Pour cette résolution,
+nous avons utilisé "SCIPY" (la liste des solvers étant disponible ici : \url{https://www.cvxpy.org/tutorial/solvers/index.html}), c'est le solver
+avec lequel nous avons eu le plus de performance, en terme de rapidité de calcul, et il semblait plus cohérent et consistant que les autres
+sur les résultats, donc nous en avons fait le choix.
 
 
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{GraphesP2/Turbinage_pompage_Q4.pdf}
-    \caption{Représentation graphique du turbinage, du pompage, ainsi que de l'afflux naturel (en MWh stocké)
+    \caption{Représentation graphique du turbinage et du pompage
     influençant le niveau du bassin \eqref{eq:4A_contr2} pour le modèle de la question 4 par période de T = 3 heures sur un an.}
     \label{fig:Turbinage_pompage_Q4}
 \end{figure}
@@ -151,7 +132,8 @@ ils semblent bien se comporter, il s'agit plus d'un ordre de grandeur que d'une 
     de la question 4 par période de T = 3 heures sur un an.}
     \label{fig:Niveau_bassin_Q4}
 \end{figure}
-Le graphique indique bien que nous remontons au niveau initial à la fin de l'année.
+\noindent Le graphique indique bien que nous remontons au niveau initial à la fin de l'année. \\
+
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{GraphesP2/Prod_Cons_Q4.pdf}
@@ -159,12 +141,79 @@ Le graphique indique bien que nous remontons au niveau initial à la fin de l'an
     par période de T = 3 heures sur un an.}
     \label{fig:Prod_Cons_Q4}
 \end{figure}
-Nous pouvons voir quelques écarts significatifs entre la production et la consommation, c'est-à-dire qu'à certains moments, nous gaspillons 
-de l'énergie car nous produisons trop (où nous avons bien retiré à la production l'énergie stockée dans le bassin, donc il s'agit d'une perte sèche).
+
+\noindent Nous pouvons voir quelques écarts significatifs entre la production et la consommation, c'est-à-dire 
+qu'à certains moments, nous "gaspillons" de l'énergie car nous produisons trop (où nous avons bien retiré à la production l'énergie stockée dans le bassin, donc il s'agit d'une perte sèche).
 
 
 \clearpage
 \section*{Question 4C}
+Pour traiter cette question, il faut s'intéresser au problème dual, une formulation pratique est la forme standard, qui nous 
+permet d'exploiter les aspects théoriques de la méthode du simplexe afin de voir l'influence d'une quantité sur le coût total.
+En réajustant le modèle dans la bonne formulation, nous avons alors 
+\begin{align}
+    \min_{c_{i},t_j,p_j} \quad &\mathrm{costs}^\intercal\mathbf{c} \nonumber\\
+    \textrm{tel que} \quad  \sum_{i=0}^{n-1} c_i e_i(j) + \eta \cdot t_j - p_j &\ge \mathrm{cons}_j \quad \forall j \in  \{ 0, \ldots, m-1 \}\label{eq:4C_contr1}\\
+     \sum_{j=0}^{k} p_j - t_j + a_j &\ge  -\frac{\mathrm{stock}_\mathrm{max}}{2} \quad \forall k \in \{ 0, \ldots, m-2 \}\label{eq:4C_contr20}\\
+    -\sum_{j=0}^{k} p_j - t_j + a_j &\ge  -\frac{\mathrm{stock}_\mathrm{max}}{2} \quad \forall k \in \{ 0, \ldots, m-2 \}\label{eq:4C_contr21}\\
+     \sum_{j=0}^{m-1} p_j - t_j + a_j &= 0 \label{eq:4C_contr3}\\
+     -c_i &\ge -c_i^\mathrm{max}  \quad \forall i \in  \{ 0, \ldots, n-1 \}  \label{eq:4C_contr40}\\
+    - \eta \cdot t_j &\ge  -t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \}  \label{eq:4C_contr50}\\
+     -p_j &\ge  -p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4C_contr60}\\
+     c_i &\ge 0  \quad \forall i \in  \{ 0, \ldots, n-1 \}   \label{eq:4C_contr41}\\
+     t_j &\ge  0 \quad \forall j \in  \{ 0, \ldots, m-1 \}  \label{eq:4C_contr51}\\
+     p_j &\ge  0 \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4C_contr61}
+\end{align}
+Sous cette forme, nous pouvons reconnaître une formulation de type $Ax \geq b, x \geq 0$ (sauf pour l'égalité, 
+mais ça peut facilement se lire comme deux inégalités, et vu que $\eta > 0$, $\eta \cdot t_j \geq 0 \iff t_j \geq 0$). Dès lors, en introduisant des variables d'écarts pour chaque inégalité ($-s_i$ et telles que $s_i \geq 0$ pour toute inégalité), nous
+pouvons facilement avoir une formulation de type $Ax = b, x \geq 0$, qui nous convient parfaitement pour le simplexe, surtout sachant que les 
+variables d'écarts ne vont pas intervenir dans la fonction objectif donc leur valeur n'importera pas pour la question. Bien que ça ne soit 
+pas la formulation la plus rigoureuse, il vaut mieux procéder ainsi afin d'éviter des notations trop lourdes, nous arrivons
+facilement à identifier dans la méthode du simplexe, puisque nous avons une solution optimale bien finie, qu'il existe deux sous-matrices
+$B$ et $N$ de notre matrice $A$ reprenant les éléments à gauche de notre formulation, que nous avons un vecteur 
+$b$ qui reprend les éléments
+$(\mathrm{cons}_0, \ldots, \mathrm{cons}_{m-1}, -\frac{\mathrm{stock}_\mathrm{max}}{2}, \ldots, 
+-\frac{\mathrm{stock}_\mathrm{max}}{2}, -\frac{\mathrm{stock}_\mathrm{max}}{2}, \ldots, 
+-\frac{\mathrm{stock}_\mathrm{max}}{2},$ \\ $ 0, -c_0^\mathrm{max}, \ldots, -c_{n-1}^\mathrm{max},
+-t_\mathrm{max}, \ldots, -t_\mathrm{max}, -p_\mathrm{max}, \ldots, -p_\mathrm{max}) $. \\ 
+Nous avons aussi le vecteur des coûts, qui peut se décomposer en coûts concernant les éléments de la base, et les éléments nuls,
+bien évidemment, ça ne change rien de réorganiser le tout au niveau des variables, 
+$\mathrm{costs}^\intercal = (\mathrm{costs}^\intercal_{B}, \mathrm{costs}^\intercal_{N})$.
+Selon la théorie, notre coût optimal est donné par $\mathrm{costs}^\intercal_{B} B^{-1} b$.
+
+
+\subsection*{Stockage}
+Si nous augmentons d'une unité notre stockage, nous avons donc que $\mathrm{stock}_\mathrm{max} \leftarrow \mathrm{stock}_\mathrm{max} + 1$ (réassignation), donc dans notre modèle,
+notre vecteur $b$ est modifié, et devient $b$ plus un vecteur comprenant $- \frac{1}{2}$ pour les contraintes 
+$\eqref{eq:4C_contr20}$ et $\eqref{eq:4C_contr21}$ et 0 sinon. Notons $\mathbf{1}_{\mathrm{stock}}$ le vecteur ayant pour composante $1$ si 
+la contrainte associée est dans $\eqref{eq:4C_contr20}$ ou $\eqref{eq:4C_contr21}$, et ayant une composante nulle sinon. Rajouter une unité de stockage 
+revient à dire que $b \leftarrow b  - \frac{1}{2} \mathbf{1}_{\mathrm{stock}}$, 
+dès lors notre coût optimal devient $\mathrm{costs}^\intercal_{B} B^{-1} \left( b - \frac{1}{2} \mathbf{1}_{\mathrm{stock}} \right) 
+= \mathrm{costs}^\intercal_{B} B^{-1} b - \frac{1}{2} \mathrm{costs}^\intercal_{B} B^{-1} \mathbf{1}_{\mathrm{stock}}  $ où le premier terme
+est connu puisque c'est la valeur de notre coût total, et la second partie peut être calculée, car $\mathrm{costs}^\intercal_{B} B^{-1}$ correspond
+à la transposée du vecteur de solution optimale du problème dual, qui peut facilement être obtenu par CVXPY. Sur le notebook Jupyter, nous calculons 
+que cela ne change pas le coût optimal, donc \underline{l'augmentation de notre capacité de stockage d'une unité ne rapporte pas d'argent}.
+
+\subsection*{Pompage}
+Procédons de la même manière que pour le stockage, nous voulons augmenter la capacité de pompage d'une unité, pour cela, étant donné que
+notre modèle se base sur des périodes de 3 heures, nous devons multiplier par 3 notre augmentation, donc cela nous donne $p_\mathrm{max} \leftarrow p_\mathrm{max} + 3$,
+et pour le vecteur $b$, il faut regarder aux contraintes \eqref{eq:4C_contr60}, en définissant de la même manière $\mathbf{1}_{\mathrm{p}}$, qui est composé
+de $1$ si la contrainte associée à la composante est dans $\eqref{eq:4C_contr60}$ et $0$ sinon. Notre coût optimal nous sera donné par 
+$\mathrm{costs}^\intercal_{B} B^{-1} \left( b - 3 \cdot \mathbf{1}_{p} \right) 
+= \mathrm{costs}^\intercal_{B} B^{-1} b - 3 \cdot \mathrm{costs}^\intercal_{B} B^{-1} \mathbf{1}_{p}  $.
+Après l'implémentation sur Python, nous avons aussi que le coût optimal reste le même, donc \underline{l'augmentation de notre capacité de pompage d'une unité 
+ne rapporte pas d'argent}
+
+\subsection*{Turbinage}
+Nous pouvons aussi faire les choses de la même façon, il faut réassigner notre valeur de turbinage en lui ajoutant 3 car nous travaillons
+sur des périodes de 3 heures, donc $t_\mathrm{max} \leftarrow t_\mathrm{max} + 3$, ensuite nous devons définir le vecteur $\mathbf{1}_{t}$ qui comme avant 
+a pour valeur 1 si sa contrainte associée est dans \eqref{eq:4C_contr50}, 0 sinon. Notre coût optimal nous sera donné par 
+$\mathrm{costs}^\intercal_{B} B^{-1} \left( b - 3 \cdot \mathbf{1}_{t} \right) 
+= \mathrm{costs}^\intercal_{B} B^{-1} b - 3 \cdot \mathrm{costs}^\intercal_{B} B^{-1} \mathbf{1}_{t}  $. D'après notre code, nous trouvons une diminution
+de notre coût de $\mathbf{1.583.760,79}$\euro, ce qui est sûrement dû au fait que notre capacité de turbinage supplémentaire nous permet de mieux
+exploiter l'afflux naturel d'eau et de gaspiller moins d'énergie en surproduisant au-dessus de la demande. \\
+
+\noindent \textit{Tout notre raisonnement reste valide par rapport aux contraintes car nous considérons que pour des petites variations, notre solution reste admissible.}
 
 \newpage
 \section*{Question 5}
@@ -228,41 +277,41 @@ par la présence des nombres entiers est bien plus complexe, et dans ce cas-ci n
 y a peu de marge sur l'ajustement des sites éoliens, et que le maximum que le solver peut faire c'est d'osciller entre 3 valeurs tout en utilisant
 les capacités du bassin le mieux possible.
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{GraphesP2/Turbinage_pompage_Q5.pdf}
-    \caption{Représentation graphique du turbinage, du pompage, ainsi que de l'afflux naturel (en MWh stocké)
+    \caption{Représentation graphique du turbinage et du pompage
     influençant le niveau du bassin \eqref{eq:5_contr2} pour le modèle de la question 4 par période de T = 3 heures sur 1000 périodes.}
     \label{fig:Turbinage_pompage_Q5}
 \end{figure}
-Dans ce graphique, nous pouvons voir qu'il y a une division moins nette entre le turbinage et le pompage que dans la résolution du modèle 4, bien entendu
-nous n'avons pas utilisé le même solver, mais l'impact du changement de variable de décision n'est pas négligable.
 
-\begin{figure}[h!]
+\noindent Dans ce graphique, nous pouvons voir que le turbinage est un peu plus varié qu'à la question 4, moins de valeurs extrêmes (au maximum/minimum), et cette fois-ci,
+le pompage est exploité contrairement à la question 4 où il est nul sur toute la période étudiée.
+
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{GraphesP2/Niveau_Bassin_Q5.pdf}
     \caption{Représentation graphique du niveau du bassin \eqref{eq:5_contr2} pour le modèle 
     de la question 5 par période de T = 3 heures sur 1000 périodes.}
     \label{fig:Niveau_bassin_Q5}
 \end{figure}
-Le graphique indique bien que nous remontons au niveau initial à la fin de la période.
-\newpage
-\begin{figure}[h!]
+
+\noindent Le graphique indique bien que nous remontons au niveau initial à la fin de la période. 
+
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{GraphesP2/Prod_Cons_Q5.pdf}
     \caption{Représentation graphique de la production et de la consommation (en MWh) 
     \eqref{eq:5_contr1} pour le modèle de la question 5 par période de T = 3 heures sur 1000 périodes.}
     \label{fig:Prod_Cons_Q5}
 \end{figure}
-Dans ce graphique, la production est beaucoup plus proche de la consommation par rapport à la question précédente, nous sommes certainement dans cette solution
-obligé d'aller puiser au maximum pour éviter le gaspillage d'un surplus de production.
-\noindent 
+\noindent Nous constatons que la production est beaucoup plus proche de la consommation par rapport à la question précédente.
 
-\newpage
+\clearpage
 
 \section*{Question 6}
 Pour ce dernier modèle, nous avons également la possibilité d'installer des centrales à gaz, qui peuvent être utilisées pour produire de l'électricité en cas de besoin.
-La puissance totale à insaller fait partie des variables de décision, ainsi que l'énergie produite par ces centrales en chaque période de $T \unit{h}$.\\
+La puissance totale à installer fait partie des variables de décision, ainsi que l'énergie produite par ces centrales en chaque période de $T \unit{h}$.\\
 Nous avons donc les nouvelles variables suivantes :
 
 \begin{table}[h!]
@@ -279,7 +328,7 @@ Nous avons donc les nouvelles variables suivantes :
         $g_j$ & \'Energie produite par les centrales à gaz durant la j\textsuperscript{ème} période\\
         \hline
     \end{tabular}
-    \caption{Table des notations des variables de décisions utilisées pour le modèle de la question 4.} 
+    \caption{Table des notations des variables de décisions utilisées pour le modèle de la question 6.} 
     \label{table:notations_variables_6}
 \end{table}
 
@@ -300,5 +349,32 @@ Le modèle devient alors :
 \noindent où $\mathrm{gas\_prod\_cost}$ est le coût de production d'énergie par les centrales à gaz et $\mathrm{gas\_install\_cost}$ est le coût d'installation des centrales à gaz.\\
 La fonction objectif tient maintenant compte du coût d'installation et de production des centrales à gaz. La contrainte \eqref{eq:6_contr1} est modifiée pour prendre en compte la production d'énergie par les centrales à gaz dans le bilan total de production. 
 Enfin, une dernière contrainte \eqref{eq:6_contr7} est ajoutée pour limiter la production d'énergie par les centrales à gaz à la puissance totale installée.
+Après la résolution numérique, nous obtenons une valeur moyenne de $\mathbf{48.15}$ \euro/MWh, ce qui est mieux que 
+les résultats de la question 4 ($\mathbf{58.282}$ \euro/MWh) et 5 ($\mathbf{382.96}$ \euro/MWh).
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{GraphesP2/Productions_Q6.pdf}
+    \caption{Représentation graphique du turbinage et du pompage
+    influençant le niveau du bassin \eqref{eq:6_contr2} ainsi que de la production de gaz pour le modèle de la question 6 par période de T = 3 heures sur un an.} 
+    \eqref{eq:5_contr1}
+    \label{fig:Q61}
+\end{figure}
+Le pompage est cette fois plus utilisé que dans la question 4.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{GraphesP2/Niveau_Bassin_Q6.pdf}
+    \caption{Représentation graphique du niveau du bassin \eqref{eq:6_contr2} pour le modèle 
+    de la question 6 par période de T = 3 heures sur 1000 périodes.} 
+    \label{fig:Q62}
+\end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{GraphesP2/Prod_Cons_Q6.pdf}
+    \caption{Représentation graphique de la production et de la consommation (en MWh) 
+    \eqref{eq:6_contr1} pour le modèle de la question 6 par période de T = 3 heures sur un an.} 
+    \label{fig:Q63}
+\end{figure}
+Bien que délicat à bien illustrer, nous pouvons voir que les valeurs de production et de consommation sont 
+assez proches.
 \end{document}
