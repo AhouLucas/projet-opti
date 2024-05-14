@@ -88,10 +88,8 @@ Le modèle peut alors s'écrire ainsi :
 \newpage
 
 La fonction objectif représente le coût total d'installation des éoliennes (en tenant compte des différences entre les installations \textit{offshore} et \textit{onshore}). \\
-La contrainte \eqref{eq:4A_contr2} fait le bilan lié aux variations des opérations de turbinage/pompage décidées et de l'apport fluvial naturel depuis le temps $t = 0$ jusqu'en tout temps $t = k$ afin de calculer l'augmentation/la diminution du niveau de l'eau dans le bassin.\\
-La formalisation peut s'obtenir en sachant que le niveau initial de notre bassin est à $0.5 \times \mathrm{stock}_\mathrm{max}$, puis que le niveau du bassin au prochain temps est le niveau du bassin passé plus les fluctuations à la période $j$, pompage - turbinage + apport fluvial, qui est donné plus formellement par $\mathrm{bassin}_{j+1} = \mathrm{bassin}_{j} + p_j - t_j + a_j$, donc en développant cette relation de récurrence, nous obtenons 
-bien le niveau de notre bassin pour toute période $j \in \{ 0, \ldots, m-1 \}$ en fonction de nos variables, et en sachant que le niveau du bassin doit revenir à son niveau initial, à la fin 
-de la période considérée, il y a une contrainte "en moins" pour \eqref{eq:4A_contr2} qui apparaît dans \eqref{eq:4A_contr3}. \\
+La contrainte \eqref{eq:4A_contr2} fait le bilan lié aux variations des opérations de turbinage/pompage décidées et de l'apport fluvial naturel depuis la période $t = 0$ jusqu'en toute période $t = k$ afin de calculer l'augmentation/la diminution du niveau de l'eau dans le bassin 
+et imposer que le niveau de l'eau reste dans les limites du stockage maximal.\\
 La contrainte \eqref{eq:4A_contr3} indique que le niveau final du bassin doit revenir au même niveau qu'initialement. Autrement dit, les opérations de turbinage/pompage et 
 l'apport fluvial doivent se sommer à 0 à la fin de la dernière période.\\
 Les contraintes \eqref{eq:4A_contr4}, \eqref{eq:4A_contr5} et \eqref{eq:4A_contr6} indiquent respectivement les bornes sur les capacités éoliennes maximales installables sur chaque site, 
@@ -105,16 +103,14 @@ production électrique dans la condition \eqref{eq:4A_contr1}.
 
 \section*{Question 4B}
 Suite à l'implémentation de notre problème d'optimisation sur le notebook Jupyter, nous obtenons 
-un coût moyen qui est d'environ $\mathbf{58.282}$\euro/MWh. \footnote{C'est une valeur qui semble cohérente, surtout pour un modèle comme ici, 
+un coût moyen qui est d'environ $\mathbf{58.282}$\euro/MWh\footnote{C'est une valeur qui semble cohérente, surtout pour un modèle comme ici, 
 assez libre et qui ne prétend pas refléter les réalités, le prix moyen de l'énergie par MWh en Europe actuellement 
 est aux alentours de quelques centaines d'euros, d'après la Commission européenne : 
 \url{https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Electricity_price_statistics}, 
-consulté le 8 mai 2024 à 01h08.} Nous avons implémenté ce problème avec la bibliothèque CVXPY qui a été recommandée, cependant
-il y a plusieurs solvers disponibles et ils donnent pour ceux qui ont été testé, des résultats différents (pour le choix des valeurs de décision) mais qui arrivent presque à
-la même valeur de fonction objectif, la différence étant sûrement due aux erreurs de calcul numérique. Pour cette résolution,
-nous avons utilisé "SCIPY" (la liste des solvers étant disponible ici : \url{https://www.cvxpy.org/tutorial/solvers/index.html}), c'est le solver
-avec lequel nous avons eu le plus de performance, en terme de rapidité de calcul, et il semblait plus cohérent et consistant que les autres
-sur les résultats, donc nous en avons fait le choix.
+consulté le 8 mai 2024 à 01h08.}.
+Nous avons implémenté ce problème avec la bibliothèque \verb|CVXPY| qui a été recommandée. Cependant, plusieurs solvers sont disponibles au sein de la librairie et fournissent des solutions différentes. La valeur de la fonction objectif est quant à elle assez proche pour tous les solvers testés, mais les valeurs des variables de décision peuvent varier.\\
+Pour cette résolution, nous avons utilisé \verb|SCIPY| (la liste des solvers étant disponible ici : \url{https://www.cvxpy.org/tutorial/solvers/index.html})
+car celui-ci fournissait les meilleures performances en termes de temps d'exécution et retournait des choix de variables de décision plus cohérents que les autres solvers.\\
 
 
 \begin{figure}[h!]
@@ -148,70 +144,47 @@ qu'à certains moments, nous "gaspillons" de l'énergie car nous produisons trop
 
 \clearpage
 \section*{Question 4C}
-Pour traiter cette question, il faut s'intéresser au problème dual, une formulation pratique est la forme standard, qui nous 
-permet d'exploiter les aspects théoriques de la méthode du simplexe afin de voir l'influence d'une quantité sur le coût total.
-En réajustant le modèle dans la bonne formulation, nous avons alors 
+Pour traiter cette question, il faut s'intéresser au problème dual. Les résultats théoriques quant à l'influence des modifications des contraintes sur la fonction objectif s'obtiennent pour un problème sous forme standard.
+En réajustant le modèle dans la bonne formulation, nous avons alors :
 \begin{align}
     \min_{c_{i},t_j,p_j} \quad &\mathrm{costs}^\intercal\mathbf{c} \nonumber\\
-    \textrm{tel que} \quad  \sum_{i=0}^{n-1} c_i e_i(j) + \eta \cdot t_j - p_j &\ge \mathrm{cons}_j \quad \forall j \in  \{ 0, \ldots, m-1 \}\label{eq:4C_contr1}\\
-     \sum_{j=0}^{k} p_j - t_j + a_j &\ge  -\frac{\mathrm{stock}_\mathrm{max}}{2} \quad \forall k \in \{ 0, \ldots, m-2 \}\label{eq:4C_contr20}\\
-    -\sum_{j=0}^{k} p_j - t_j + a_j &\ge  -\frac{\mathrm{stock}_\mathrm{max}}{2} \quad \forall k \in \{ 0, \ldots, m-2 \}\label{eq:4C_contr21}\\
-     \sum_{j=0}^{m-1} p_j - t_j + a_j &= 0 \label{eq:4C_contr3}\\
-     -c_i &\ge -c_i^\mathrm{max}  \quad \forall i \in  \{ 0, \ldots, n-1 \}  \label{eq:4C_contr40}\\
-    - \eta \cdot t_j &\ge  -t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \}  \label{eq:4C_contr50}\\
-     -p_j &\ge  -p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4C_contr60}\\
-     c_i &\ge 0  \quad \forall i \in  \{ 0, \ldots, n-1 \}   \label{eq:4C_contr41}\\
-     t_j &\ge  0 \quad \forall j \in  \{ 0, \ldots, m-1 \}  \label{eq:4C_contr51}\\
-     p_j &\ge  0 \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4C_contr61}
+    \textrm{tel que} \quad & \sum_{i=0}^{n-1} c_i e_i(j) + \eta \cdot t_j - p_j - s_{1,j} = \mathrm{cons}_j \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4C_contr1}\\
+    &\sum_{j=0}^{k} p_j - t_j + a_j + s_{2,k} =  \frac{\mathrm{stock}_\mathrm{max}}{2} \quad \forall k \in \{ 0, \ldots, m-2 \} \label{eq:4C_contr2}\\
+    &\sum_{j=0}^{k} p_j - t_j + a_j - s_{3,k} =  -\frac{\mathrm{stock}_\mathrm{max}}{2} \quad \forall k \in \{ 0, \ldots, m-2 \} \label{eq:4C_contr3}\\
+    & \sum_{j=0}^{m-1} p_j - t_j + a_j = 0\\
+    &c_i + s_{4,j} = c_i^\mathrm{max} \quad \forall i \in  \{ 0, \ldots, n-1 \}\\
+    &\eta \cdot t_j + s_{5,j} = t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4C_contr6}\\
+    &p_j + s_{6,j} = p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4C_contr7}\\
+    & c_i, t_j, p_j, s_{1,j}, s_{2,k}, s_{3,k}, s_{4,j}, s_{5,j}, s_{6,j} \geq 0
 \end{align}
-Sous cette forme, nous pouvons reconnaître une formulation de type $Ax \geq b, x \geq 0$ (sauf pour l'égalité, 
-mais ça peut facilement se lire comme deux inégalités, et vu que $\eta > 0$, $\eta \cdot t_j \geq 0 \iff t_j \geq 0$). Dès lors, en introduisant des variables d'écarts pour chaque inégalité ($-s_i$ et telles que $s_i \geq 0$ pour toute inégalité), nous
-pouvons facilement avoir une formulation de type $Ax = b, x \geq 0$, qui nous convient parfaitement pour le simplexe, surtout sachant que les 
-variables d'écarts ne vont pas intervenir dans la fonction objectif donc leur valeur n'importera pas pour la question. Bien que ça ne soit 
-pas la formulation la plus rigoureuse, il vaut mieux procéder ainsi afin d'éviter des notations trop lourdes, nous arrivons
-facilement à identifier dans la méthode du simplexe, puisque nous avons une solution optimale bien finie, qu'il existe deux sous-matrices
-$B$ et $N$ de notre matrice $A$ reprenant les éléments à gauche de notre formulation, que nous avons un vecteur 
-$b$ qui reprend les éléments
-$(\mathrm{cons}_0, \ldots, \mathrm{cons}_{m-1}, -\frac{\mathrm{stock}_\mathrm{max}}{2}, \ldots, 
--\frac{\mathrm{stock}_\mathrm{max}}{2}, -\frac{\mathrm{stock}_\mathrm{max}}{2}, \ldots, 
--\frac{\mathrm{stock}_\mathrm{max}}{2},$ \\ $ 0, -c_0^\mathrm{max}, \ldots, -c_{n-1}^\mathrm{max},
--t_\mathrm{max}, \ldots, -t_\mathrm{max}, -p_\mathrm{max}, \ldots, -p_\mathrm{max}) $. \\ 
-Nous avons aussi le vecteur des coûts, qui peut se décomposer en coûts concernant les éléments de la base, et les éléments nuls,
-bien évidemment, ça ne change rien de réorganiser le tout au niveau des variables, 
-$\mathrm{costs}^\intercal = (\mathrm{costs}^\intercal_{B}, \mathrm{costs}^\intercal_{N})$.
-Selon la théorie, notre coût optimal est donné par $\mathrm{costs}^\intercal_{B} B^{-1} b$.
-
+Où nous avons ajouté des variables d'écart $s_{\cdot,j}$ pour chaque contrainte contenant une inégalité.
+Le problème dual s'écrit alors :
+\begin{align*}
+    \max_{y} \quad &b^\intercal y \quad\\ 
+    \textrm{tel que} \quad &A^\intercal y \leq c\\
+    & y \text{ libres}
+\end{align*}
+Les solutions de ce problème dual sont également données par le solver \verb|SCIPY| après la résolution du primal, ce qui nous permet de calculer les variations de la fonction objectif
+lorsque nous modifions les capacités de stockage, de turbinage et de pompage.
 
 \subsection*{Stockage}
-Si nous augmentons d'une unité notre stockage, nous avons donc que $\mathrm{stock}_\mathrm{max} \leftarrow \mathrm{stock}_\mathrm{max} + 1$ (réassignation), donc dans notre modèle,
-notre vecteur $b$ est modifié, et devient $b$ plus un vecteur comprenant $- \frac{1}{2}$ pour les contraintes 
-$\eqref{eq:4C_contr20}$ et $\eqref{eq:4C_contr21}$ et 0 sinon. Notons $\mathbf{1}_{\mathrm{stock}}$ le vecteur ayant pour composante $1$ si 
-la contrainte associée est dans $\eqref{eq:4C_contr20}$ ou $\eqref{eq:4C_contr21}$, et ayant une composante nulle sinon. Rajouter une unité de stockage 
-revient à dire que $b \leftarrow b  - \frac{1}{2} \mathbf{1}_{\mathrm{stock}}$, 
-dès lors notre coût optimal devient $\mathrm{costs}^\intercal_{B} B^{-1} \left( b - \frac{1}{2} \mathbf{1}_{\mathrm{stock}} \right) 
-= \mathrm{costs}^\intercal_{B} B^{-1} b - \frac{1}{2} \mathrm{costs}^\intercal_{B} B^{-1} \mathbf{1}_{\mathrm{stock}}  $ où le premier terme
-est connu puisque c'est la valeur de notre coût total, et la second partie peut être calculée, car $\mathrm{costs}^\intercal_{B} B^{-1}$ correspond
-à la transposée du vecteur de solution optimale du problème dual, qui peut facilement être obtenu par CVXPY. Sur le notebook Jupyter, nous calculons 
-que cela ne change pas le coût optimal, donc \underline{l'augmentation de notre capacité de stockage d'une unité ne rapporte pas d'argent}.
+Si nous augmentons d'une unité notre stockage, nous avons donc que $\mathrm{stock}_\mathrm{max} \leftarrow \mathrm{stock}_\mathrm{max} + 1$ (réassignation). Donc dans notre modèle,
+notre vecteur $b$ est modifié, et devient $b$ plus un vecteur comprenant $\frac{1}{2}$ pour les contraintes 
+\eqref{eq:4C_contr2}, $-\frac{1}{2}$ pour les contraintes \eqref{eq:4C_contr3} et 0 sinon. Si nous notons ce vecteur $\Delta b_{\mathrm{stock}}$, alors notre coût optimal augmentera de
+$y^{* \intercal}\cdot \Delta b_{\mathrm{stock}}$ où $y^{*}$ est la solution du problème dual. Cela correspond en fait simplement à la somme des valeurs des variables duales associées aux contraintes
+\eqref{eq:4C_contr2} et \eqref{eq:4C_contr3} multipliées par $\frac{1}{2}$ et $-\frac{1}{2}$ respectivement. Après l'implémentation en Python, nous avons que le coût optimal reste le même, donc \underline{l'augmentation de notre capacité de stockage d'une unité n'influence pas notre coût total}.
 
 \subsection*{Pompage}
-Procédons de la même manière que pour le stockage, nous voulons augmenter la capacité de pompage d'une unité, pour cela, étant donné que
-notre modèle se base sur des périodes de 3 heures, nous devons multiplier par 3 notre augmentation, donc cela nous donne $p_\mathrm{max} \leftarrow p_\mathrm{max} + 3$,
-et pour le vecteur $b$, il faut regarder aux contraintes \eqref{eq:4C_contr60}, en définissant de la même manière $\mathbf{1}_{\mathrm{p}}$, qui est composé
-de $1$ si la contrainte associée à la composante est dans $\eqref{eq:4C_contr60}$ et $0$ sinon. Notre coût optimal nous sera donné par 
-$\mathrm{costs}^\intercal_{B} B^{-1} \left( b - 3 \cdot \mathbf{1}_{p} \right) 
-= \mathrm{costs}^\intercal_{B} B^{-1} b - 3 \cdot \mathrm{costs}^\intercal_{B} B^{-1} \mathbf{1}_{p}  $.
-Après l'implémentation sur Python, nous avons aussi que le coût optimal reste le même, donc \underline{l'augmentation de notre capacité de pompage d'une unité 
-ne rapporte pas d'argent}
+Nous pouvons procéder d'une manière similaire pour observer l'influence d'une augmentation de la capacité de pompage d'une valeur de $1 \unit{MW}$.
+Puisque nous travaillons sur des périodes de $T = 3 \unit{h}$, la valeur de la contrainte \eqref{eq:4C_contr7} est modifiée de $p_\mathrm{max}$ à $p_\mathrm{max} + 3$. 
+Nous sommons alors les valeurs des variables duales associées à cette contrainte que nous multiplions par $3$ pour obtenir la variation du coût optimal. 
+Après l'implémentation en Python, nous avons que le coût optimal reste inchangé après l'augmentation de la capacité de pompage, donc \underline{l'augmentation de notre capacité de pompage d'une unité n'influence pas notre coût total}.
 
 \subsection*{Turbinage}
-Nous pouvons aussi faire les choses de la même façon, il faut réassigner notre valeur de turbinage en lui ajoutant 3 car nous travaillons
-sur des périodes de 3 heures, donc $t_\mathrm{max} \leftarrow t_\mathrm{max} + 3$, ensuite nous devons définir le vecteur $\mathbf{1}_{t}$ qui comme avant 
-a pour valeur 1 si sa contrainte associée est dans \eqref{eq:4C_contr50}, 0 sinon. Notre coût optimal nous sera donné par 
-$\mathrm{costs}^\intercal_{B} B^{-1} \left( b - 3 \cdot \mathbf{1}_{t} \right) 
-= \mathrm{costs}^\intercal_{B} B^{-1} b - 3 \cdot \mathrm{costs}^\intercal_{B} B^{-1} \mathbf{1}_{t}  $. D'après notre code, nous trouvons une diminution
-de notre coût de $\mathbf{1.583.760,79}$\euro, ce qui est sûrement dû au fait que notre capacité de turbinage supplémentaire nous permet de mieux
-exploiter l'afflux naturel d'eau et de gaspiller moins d'énergie en surproduisant au-dessus de la demande. \\
+Enfin, nous pouvons observer l'influence d'une augmentation de la capacité de turbinage d'une valeur de $1 \unit{MW}$.
+Puisque nous travaillons sur des périodes de $T = 3 \unit{h}$, la valeur de la contrainte \eqref{eq:4C_contr6} est modifiée de $t_\mathrm{max}$ à $t_\mathrm{max} + 3$.
+Nous sommons alors les valeurs des variables duales associées à cette contrainte que nous multiplions par $3$ pour obtenir la variation du coût optimal 
+et nous obtenons que le coût optimal diminue d'une valeur de $\mathbf{1.583.760,79}$ \euro. Cette diminution peut être expliquée par le fait que nous pouvons profiter davantage de l'apport fluvial pour la consommation d'énergie et ainsi moins dépendre des installations éoliennes.\\ 
 
 \noindent \textit{Tout notre raisonnement reste valide par rapport aux contraintes car nous considérons que pour des petites variations, notre solution reste admissible.}
 
@@ -251,18 +224,15 @@ Pour ce faire, nous rédéfinissons les variables $c_i$ de la question 4 :
     & 0 \le \eta \cdot t_j \le  t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:5_contr5}\\
     & 0 \le p_j \le  p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:5_contr6} 
 \end{align}
-Ici, nous avons gardé les mêmes contraintes sauf pour celles concernant les $c_i$, la \eqref{eq:5_contr4} nous dit bien
-que les $c_i$ sont entre 0 et 2, et vu qu'ils sont entiers, nous avons bien nos valeurs atetndues, ensuite la \eqref{eq:5_contr1}
-nous donne la même contrainte par rapport au fait que la consommation doit être satisfaite, sauf qu'il faut ajuster
-les $c_i$ pour qu'ils nous donnent 0, 50\% et 100\% de la capacité maximale. Il y a également eu un léger changement dans la 
-fonction objectif. \\
+Ici, seule les contraintes sur les $c_i$ ont été modifiées. Nous imposons maintenant que les $c_i$ soient des entiers compris entre 0 et 2 (compris).
+La fonction objectif a également dû être adapté selon notre nouveau choix de variables.\\ 
 Pour la résolution de ce modèle, nous avons dû réduire la durée étudiée, en effet, nous avons tout d'abord
-testé avec 2920 périodes (au complet), avec le solver par défaut de CVXPY, nous avions dépassé les 180 minutes
-d'exécution et avons alors arrêté, ensuite nous avons testé avec le solver SCIPY et avons arrêté au-dessus de 120
-minutes, nous avons en premier lieu ensuite réduit le nombre de périodes à 1500, nous avions excédé les 65
-minutes avec encore le solver SCIPY. Enfin, nous avons défini le nombre de périodes à \textbf{1000}, et nous arrivons
-à \textbf{46 minutes et 10.5 secondes} de calcul, donc nous avons conclu que notre choix de durée était raisonnable.
-Lorsque nous résolvons notre modèle avec SCIPY pour 1000 périodes, nous obtenons un coût total de "$125.935.889.457,89$ \euro", mais il reste
+testé avec 2920 périodes (au complet), avec le solver par défaut de \verb|CVXPY|, nous avions dépassé les 180 minutes
+d'exécution et avons alors arrêté. Nous avons ensuite testé avec le solver \verb|SCIPY| et avons arrêté au-dessus de 120
+minutes. Nous avons en premier lieu réduit le nombre de périodes à 1500, nous avions excédé les 65
+minutes avec encore le solver \verb|SCIPY|. Enfin, nous avons défini le nombre de périodes à \textbf{1000}, et nous arrivons
+à \textbf{46 minutes et 10.5 secondes} de calcul. Nous avons conclu que ce dernier choix de durée était raisonnable.
+Lorsque nous résolvons notre modèle avec \verb|SCIPY| pour 1000 périodes, nous obtenons un coût total de $125.935.889.457,89$ \euro, mais il reste
 à déterminer quelle est la bonne unité, en sachant que nos $c_i^{max}$ sont en $MW$, si nos coûts d'installations peuvent être amortis sur une sous-période, chose très improbable, nous aurions
 alors des $\frac{\text{\euro}}{MW \cdot 1000 p}$ (en notant 1000 p le fait que nous avons 1000 périodes et en sachant 
 qu'un an = 2920 p)
