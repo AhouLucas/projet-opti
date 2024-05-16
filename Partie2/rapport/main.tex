@@ -108,10 +108,22 @@ assez libre et qui ne prétend pas refléter les réalités, le prix moyen de l'
 est aux alentours de quelques centaines d'euros, d'après la Commission européenne : 
 \url{https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Electricity_price_statistics}, 
 consulté le 8 mai 2024 à 01h08.}.
-Nous avons implémenté ce problème avec la bibliothèque \verb|CVXPY| qui a été recommandée. Cependant, plusieurs solvers sont disponibles au sein de la librairie et fournissent des solutions différentes. La valeur de la fonction objectif est quant à elle assez proche pour tous les solvers testés, mais les valeurs des variables de décision peuvent varier.\\
+Nous avons implémenté ce problème avec la bibliothèque \verb|CVXPY| qui a été recommandée. Cependant, plusieurs solvers sont disponibles au sein de la librairie, la valeur de la fonction objectif est la même pour tous les solvers testés, mais les valeurs des variables de décision peuvent varier.\\
 Pour cette résolution, nous avons utilisé \verb|SCIPY| (la liste des solvers étant disponible ici : \url{https://www.cvxpy.org/tutorial/solvers/index.html})
-car celui-ci fournissait les meilleures performances en termes de temps d'exécution et retournait des choix de variables de décision plus cohérents que les autres solvers.\\
+car celui-ci fournissait les meilleures performances en termes de temps d'exécution et retournait des choix de variables de décision plus cohérents que les autres solvers 
+(très subjectif, techniquement ils sont tous aussi valides si adaptés à la programmation linéaire). \\
+Nous pouvons voir que les sites choisis ne se retrouvent que 8 fois en dehors des valeurs $\{0,1\}$, donc notre résolution
+tend souvent à soit installer la capacité maximale sur un site, soit ne rien n'y installer, en moyenne.
+Nous remontons au niveau initial à la fin de l'année. Nous pouvons voir quelques écarts significatifs entre la production et la consommation, c'est-à-dire 
+qu'à certains moments, nous "gaspillons" de l'énergie car nous produisons trop (où nous avons bien retiré à la production l'énergie stockée dans le bassin, donc il s'agit d'une perte sèche).
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.6]{GraphesP2/Capacité_Eolienne_Q4.pdf}
+    \caption{Représentation graphique de la proportion de la capacité éolienne installée sur chaque site pour le modèle de la question 4 par période
+    de T = 3 heures sur une année.}
+    \label{fig:Capacité_Eolienne_Q4}
+\end{figure}
 
 \begin{figure}[h!]
     \centering
@@ -120,7 +132,7 @@ car celui-ci fournissait les meilleures performances en termes de temps d'exécu
     influençant le niveau du bassin \eqref{eq:4A_contr2} pour le modèle de la question 4 par période de T = 3 heures sur un an.}
     \label{fig:Turbinage_pompage_Q4}
 \end{figure}
-\newpage
+
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=0.6]{GraphesP2/Niveau_Bassin_Q4.pdf}
@@ -128,7 +140,6 @@ car celui-ci fournissait les meilleures performances en termes de temps d'exécu
     de la question 4 par période de T = 3 heures sur un an.}
     \label{fig:Niveau_bassin_Q4}
 \end{figure}
-\noindent Le graphique indique bien que nous remontons au niveau initial à la fin de l'année. \\
 
 \begin{figure}[h!]
     \centering
@@ -138,8 +149,6 @@ car celui-ci fournissait les meilleures performances en termes de temps d'exécu
     \label{fig:Prod_Cons_Q4}
 \end{figure}
 
-\noindent Nous pouvons voir quelques écarts significatifs entre la production et la consommation, c'est-à-dire 
-qu'à certains moments, nous "gaspillons" de l'énergie car nous produisons trop (où nous avons bien retiré à la production l'énergie stockée dans le bassin, donc il s'agit d'une perte sèche).
 
 
 \clearpage
@@ -184,7 +193,7 @@ Après l'implémentation en Python, nous avons que le coût optimal reste inchan
 Enfin, nous pouvons observer l'influence d'une augmentation de la capacité de turbinage d'une valeur de $1 \unit{MW}$.
 Puisque nous travaillons sur des périodes de $T = 3 \unit{h}$, la valeur de la contrainte \eqref{eq:4C_contr6} est modifiée de $t_\mathrm{max}$ à $t_\mathrm{max} + 3$.
 Nous sommons alors les valeurs des variables duales associées à cette contrainte que nous multiplions par $3$ pour obtenir la variation du coût optimal 
-et nous obtenons que le coût optimal diminue d'une valeur de $\mathbf{1.583.760,79}$ \euro. Cette diminution peut être expliquée par le fait que nous pouvons profiter davantage de l'apport fluvial pour la consommation d'énergie et ainsi moins dépendre des installations éoliennes.\\ 
+et nous obtenons que le coût optimal diminue d'une valeur de $\mathbf{1.583.760,79}$ \euro, soit environ $0.001$\% de diminution. Cette diminution peut être expliquée par le fait que nous pouvons profiter davantage de l'apport fluvial pour la consommation d'énergie et ainsi moins dépendre des installations éoliennes.\\ 
 
 \noindent \textit{Tout notre raisonnement reste valide par rapport aux contraintes car nous considérons que pour des petites variations, notre solution reste admissible.}
 
@@ -225,27 +234,49 @@ Pour ce faire, nous rédéfinissons les variables $c_i$ de la question 4 :
     & 0 \le p_j \le  p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:5_contr6} 
 \end{align}
 Ici, seule les contraintes sur les $c_i$ ont été modifiées. Nous imposons maintenant que les $c_i$ soient des entiers compris entre 0 et 2 (compris).
-La fonction objectif a également dû être adapté selon notre nouveau choix de variables.\\ 
+La fonction objectif a également dû être adaptée selon notre nouveau choix de variables.\\ 
 Pour la résolution de ce modèle, nous avons dû réduire la durée étudiée, en effet, nous avons tout d'abord
 testé avec 2920 périodes (au complet), avec le solver par défaut de \verb|CVXPY|, nous avions dépassé les 180 minutes
 d'exécution et avons alors arrêté. Nous avons ensuite testé avec le solver \verb|SCIPY| et avons arrêté au-dessus de 120
-minutes. Nous avons en premier lieu réduit le nombre de périodes à 1500, nous avions excédé les 65
+minutes. Nous avons en second lieu réduit le nombre de périodes à 1500, nous avions excédé les 65
 minutes avec encore le solver \verb|SCIPY|. Enfin, nous avons défini le nombre de périodes à \textbf{1000}, et nous arrivons
 à \textbf{46 minutes et 10.5 secondes} de calcul. Nous avons conclu que ce dernier choix de durée était raisonnable.
-Lorsque nous résolvons notre modèle avec \verb|SCIPY| pour 1000 périodes, nous obtenons un coût total de $125.935.889.457,89$ \euro, mais il reste
-à déterminer quelle est la bonne unité, en sachant que nos $c_i^{max}$ sont en $MW$, si nos coûts d'installations peuvent être amortis sur une sous-période, chose très improbable, nous aurions
-alors des $\frac{\text{\euro}}{MW \cdot 1000 p}$ (en notant 1000 p le fait que nous avons 1000 périodes et en sachant 
-qu'un an = 2920 p)
-ce qui nous ferait un coût moyen, en divisant par la consommation sur ces 1000 périodes 
-de $131.15 \frac{\text{\euro}}{MWh}$, mais ça ne semble pas être la bonne piste, gardons l'idée de l'amortissement par an, 
-nous avons alors un coût total de $125.935.889.457,89 \frac{\text{\euro}}{an}$, si nous divisons par la consommation 
-nous avons alors un coût moyen de $131.15 \frac{\text{\euro}}{an}*\frac{1000 p}{ MW}$, 
-et si nous souhaitons des $\frac{\text{\euro}}{MWh}$, il suffit 
-de multiplier par $an/ 1000 p  = \frac{2920}{1000}$ ce qui nous donne approximativement $\mathbf{382.96} \frac{\text{\euro}}{MWh}$.
-Ce coût moyen est bien plus élevé que pour le modèle de la question 4, le temps de calcul a été aussi lourdement impacté, l'optimisation
-par la présence des nombres entiers est bien plus complexe, et dans ce cas-ci nous amène un moins bon coût, cela s'explique par le fait qu'il
-y a peu de marge sur l'ajustement des sites éoliens, et que le maximum que le solver peut faire c'est d'osciller entre 3 valeurs tout en utilisant
-les capacités du bassin le mieux possible.
+Ensuite, nous supposons que le coût d'installation des éoliennes
+est réduit à la durée étudiée, c'est à dire que notre vrai vecteur de coûts sera donné par "$\frac{1000}{2920} \mathrm{costs}$".
+Nous effectuons les calculs sur le solver pour le coût initial ($\mathrm{costs}$), ensuite nous ajustons 
+par ce facteur ($\frac{1000}{2920}$) pour vous présenter les résultats.
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.5}% Add spacing between rows : default value is 1
+    \begin{tabular}{|c | c |} 
+        \hline
+        Modèle & Coût moyen (€/MWh) \\
+        \hline
+        Variables éoliennes discrètes (Question 5) & 44.914 \\
+        \hline
+        Variables éoliennes continues (Question 4) & 44.899 \\
+        \hline
+    \end{tabular}
+    \caption{Comparaison des coûts moyens (ajustés par rapport à 1000 périodes) de la question 4 et 5.}
+    \label{table:comparaison_resultat_Q5_Q4_1000}
+\end{table} 
+\noindent Nous constatons que le coût moyen a légèrement augmenté (bien que cela reste assez important à l'échelle
+de l'Europe en termes de coût), c'est assez normal car nous restreignons les valeurs possibles d'installation 
+de puissances de chaque site éolien, mais visiblement nous n'avons pas une augmentation si importante, peut-être par le fait 
+que lors de la résolution de la question 4 (\autoref{fig:Capacité_Eolienne_Q4}), nous n'avions pas tellement de sites
+comportant des valeurs de capacités installées intermédiaires, mais plus concentrées à 0 et à 1. Nous illustrons la différence sur le choix de l'installation 
+de la capacité éolienne en fonction de notre modèle avec des variables discrètes et continues. Nous pouvons voir que le turbinage est un peu plus varié qu'à la question 4, moins de valeurs extrêmes (au maximum/minimum), et cette fois-ci,
+le pompage est exploité contrairement à la question 4 où il est nul sur toute la période étudiée. 
+Nous remontons encore une fois bien au niveau initial à la fin de la période.  
+Nous constatons que la production est beaucoup plus proche de la consommation par rapport à la question précédente.
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.6]{GraphesP2/Capacité_Eolienne_Q5.pdf}
+    \caption{Représentation graphique de la proportion de la capacité éolienne installée sur chaque site pour le modèle de la question 5 en comparaison
+    avec le modèle de la question 5, par période
+    de T = 3 heures sur 1000 périodes.}
+    \label{fig:Capacité_Eolienne_Q5}
+\end{figure}
 
 \begin{figure}[H]
     \centering
@@ -255,9 +286,6 @@ les capacités du bassin le mieux possible.
     \label{fig:Turbinage_pompage_Q5}
 \end{figure}
 
-\noindent Dans ce graphique, nous pouvons voir que le turbinage est un peu plus varié qu'à la question 4, moins de valeurs extrêmes (au maximum/minimum), et cette fois-ci,
-le pompage est exploité contrairement à la question 4 où il est nul sur toute la période étudiée.
-
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{GraphesP2/Niveau_Bassin_Q5.pdf}
@@ -266,8 +294,6 @@ le pompage est exploité contrairement à la question 4 où il est nul sur toute
     \label{fig:Niveau_bassin_Q5}
 \end{figure}
 
-\noindent Le graphique indique bien que nous remontons au niveau initial à la fin de la période. 
-
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{GraphesP2/Prod_Cons_Q5.pdf}
@@ -275,7 +301,6 @@ le pompage est exploité contrairement à la question 4 où il est nul sur toute
     \eqref{eq:5_contr1} pour le modèle de la question 5 par période de T = 3 heures sur 1000 périodes.}
     \label{fig:Prod_Cons_Q5}
 \end{figure}
-\noindent Nous constatons que la production est beaucoup plus proche de la consommation par rapport à la question précédente.
 
 \clearpage
 
@@ -320,19 +345,34 @@ Le modèle devient alors :
 La fonction objectif tient maintenant compte du coût d'installation et de production des centrales à gaz. La contrainte \eqref{eq:6_contr1} est modifiée pour prendre en compte la production d'énergie par les centrales à gaz dans le bilan total de production. 
 Enfin, une dernière contrainte \eqref{eq:6_contr7} est ajoutée pour limiter la production d'énergie par les centrales à gaz à la puissance totale installée.
 Après la résolution numérique, nous obtenons une valeur moyenne de $\mathbf{48.15}$ \euro/MWh, ce qui est mieux que 
-les résultats de la question 4 ($\mathbf{58.282}$ \euro/MWh) et 5 ($\mathbf{382.96}$ \euro/MWh).
+le résultat de la question 4 ($\mathbf{58.282}$ \euro/MWh). Cela peut s'expliquer par le fait que nous
+avons plus de possibilités, dans le sens que nous pouvons ajuster la production avec un levier en plus,
+ce qui fait que nous pouvons mieux répartir notre production énergétique afin de minimiser le coût. \\
+L'introduction des variables concernant le gaz ne semblent pas avoir influencé les capacités éoliennes installées 
+par rapport à la question 4 (\autoref{fig:Capacité_Eolienne_Q4} / \autoref{fig:Q60}). 
+Le pompage est cette fois plus utilisé que dans la question 4 (\autoref{fig:Turbinage_pompage_Q4})
+Bien que délicat à bien illustrer, nous pouvons voir que les valeurs de production et de consommation sont 
+assez proches.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.6]{GraphesP2/Capacité_Eolienne_Q6.pdf}
+    \caption{Représentation graphique de la proportion de la capacité éolienne installée sur chaque site pour le modèle de la question 6 par période
+    de T = 3 heures sur une année.}
+    \label{fig:Q60}
+\end{figure}
+
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{GraphesP2/Productions_Q6.pdf}
     \caption{Représentation graphique du turbinage et du pompage
     influençant le niveau du bassin \eqref{eq:6_contr2} ainsi que de la production de gaz pour le modèle de la question 6 par période de T = 3 heures sur un an.} 
-    \eqref{eq:5_contr1}
     \label{fig:Q61}
 \end{figure}
-Le pompage est cette fois plus utilisé que dans la question 4.
+
 \begin{figure}[h!]
     \centering
-    \includegraphics[scale=0.5]{GraphesP2/Niveau_Bassin_Q6.pdf}
+    \includegraphics[scale=0.6]{GraphesP2/Niveau_Bassin_Q6.pdf}
     \caption{Représentation graphique du niveau du bassin \eqref{eq:6_contr2} pour le modèle 
     de la question 6 par période de T = 3 heures sur 1000 périodes.} 
     \label{fig:Q62}
@@ -345,6 +385,5 @@ Le pompage est cette fois plus utilisé que dans la question 4.
     \eqref{eq:6_contr1} pour le modèle de la question 6 par période de T = 3 heures sur un an.} 
     \label{fig:Q63}
 \end{figure}
-Bien que délicat à bien illustrer, nous pouvons voir que les valeurs de production et de consommation sont 
-assez proches.
+
 \end{document}
