@@ -199,6 +199,8 @@ et nous obtenons que le coût optimal diminue d'une valeur de $\mathbf{1.583.760
 
 \newpage
 \section*{Question 5}
+
+\subsection*{Modèle}
 Nous devons à présent choisir, pour chaque site d'éoliennes, si nous installons $0\%, 50\%$ ou $100\%$ de la capacité maximale installable sur ce site.
 Pour ce faire, nous rédéfinissons les variables $c_i$ de la question 4 :
 
@@ -234,7 +236,11 @@ Pour ce faire, nous rédéfinissons les variables $c_i$ de la question 4 :
     & 0 \le p_j \le  p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:5_contr6} 
 \end{align}
 Ici, seule les contraintes sur les $c_i$ ont été modifiées. Nous imposons maintenant que les $c_i$ soient des entiers compris entre 0 et 2 (compris).
-La fonction objectif a également dû être adaptée selon notre nouveau choix de variables.\\ 
+La fonction objectif a également dû être adaptée selon notre nouveau choix de variables.
+
+\pagebreak
+
+\subsection*{Résolution}
 Pour la résolution de ce modèle, nous avons dû réduire la durée étudiée, en effet, nous avons tout d'abord
 testé avec 2920 périodes (au complet), avec le solver par défaut de \verb|CVXPY|, nous avions dépassé les 180 minutes
 d'exécution et avons alors arrêté. Nous avons ensuite testé avec le solver \verb|SCIPY| et avons arrêté au-dessus de 120
@@ -305,6 +311,8 @@ Sur la figure \ref{fig:Prod_Cons_Q5}, nous constatons que la production est beau
 \clearpage
 
 \section*{Question 6}
+
+\subsection*{Modèle}
 Pour ce dernier modèle, nous avons également la possibilité d'installer des centrales à gaz, qui peuvent être utilisées pour produire de l'électricité en cas de besoin.
 La puissance totale à installer fait partie des variables de décision, ainsi que l'énergie produite par ces centrales en chaque période de $T \unit{h}$.\\
 Nous avons donc les nouvelles variables suivantes :
@@ -344,6 +352,10 @@ Le modèle devient alors :
 \noindent où $\mathrm{gas\_prod\_cost}$ est le coût de production d'énergie par les centrales à gaz et $\mathrm{gas\_install\_cost}$ est le coût d'installation des centrales à gaz.\\
 La fonction objectif tient maintenant compte du coût d'installation et de production des centrales à gaz. La contrainte \eqref{eq:6_contr1} est modifiée pour prendre en compte la production d'énergie par les centrales à gaz dans le bilan total de production. 
 Enfin, une dernière contrainte \eqref{eq:6_contr7} est ajoutée pour limiter la production d'énergie par les centrales à gaz à la puissance totale installée.
+
+\pagebreak
+
+\subsection*{Résolution}
 Après la résolution numérique, nous obtenons une valeur moyenne de $\mathbf{48.15}$ \euro/MWh, ce qui est mieux que 
 le résultat de la question 4 ($\mathbf{58.282}$ \euro/MWh). Cela peut s'expliquer par le fait que nous
 avons plus de possibilités, dans le sens que nous pouvons ajuster la production avec un levier en plus,
