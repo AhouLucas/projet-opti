@@ -84,7 +84,10 @@ Le modèle peut alors s'écrire ainsi :
 \end{align}
 
 La fonction objectif représente le coût total d'installation des éoliennes (en tenant compte des différences entre les installations \textit{offshore} et \textit{onshore}). \\
-La contrainte \eqref{eq:4A_contr2} fait le bilan lié aux variations des opérations de turbinage/pompage décidées et de l'apport fluvial naturel depuis la période $t = 0$ jusqu'en toute période $t = k$ afin de calculer l'augmentation/la diminution du niveau de l'eau dans le bassin 
+La contrainte \eqref{eq:4A_contr2} fait le bilan lié aux variations des opérations de 
+turbinage/pompage décidées et de l'apport fluvial naturel depuis la période $j = 0$ 
+jusqu'en toute période $j = k$ (donc nous faisons le bilan en toute période $k$ de notre total de pompage, turbinage, et afflux naturel) afin de calculer l'augmentation/la diminution du niveau de l'eau 
+dans le bassin 
 et imposer que le niveau de l'eau reste dans les limites du stockage maximal.\\
 La contrainte \eqref{eq:4A_contr3} indique que le niveau final du bassin doit revenir au même niveau qu'initialement. Autrement dit, les opérations de turbinage/pompage et 
 l'apport fluvial doivent se sommer à 0 à la fin de la dernière période.\\
@@ -92,7 +95,7 @@ Les contraintes \eqref{eq:4A_contr4}, \eqref{eq:4A_contr5} et \eqref{eq:4A_contr
 les capacités maximales de turbinages et les capacités maximales de pompages pour des périodes de $T \unit{h}$, regroupées au niveau européen, bien entendu.
 Nous avons cependant supposé pour la \eqref{eq:4A_contr5} contrainte, liée au turbinage, que la valeur $t_j$ est ce que 
 nous extrayons du bassin, puis
-la capacité $t_\mathrm{max}$ restreint alors l'énergie en sortie de la turbine ($\eta \cdot t_j$), qui sert à la 
+la capacité $T \cdot t_\mathrm{max}$ ($T$ fois cette capacité car nous travaillons sur des périodes de $T$ heures) restreint alors l'énergie en sortie de la turbine ($\eta \cdot t_j$), qui sert à la 
 production électrique dans la contrainte \eqref{eq:4A_contr1}.
 
 \newpage % Car il faudra rendre sur Gradescope en séparant les questions
@@ -186,13 +189,13 @@ $y^{* \intercal}\cdot \Delta b_{\mathrm{stock}}$ où $y^{*}$ est la solution du 
 
 \subsection*{Pompage}
 Nous pouvons procéder d'une manière similaire pour observer l'influence d'une augmentation de la capacité de pompage d'une valeur de $1 \unit{MW}$.
-Puisque nous travaillons sur des périodes de $T = 3 \unit{h}$, la valeur de la contrainte \eqref{eq:4C_contr7} est modifiée de $p_\mathrm{max}$ à $p_\mathrm{max} + 3$. 
+Puisque nous travaillons sur des périodes de $T = 3 \unit{h}$, la valeur de la contrainte \eqref{eq:4C_contr7} est modifiée de $T \cdot p_\mathrm{max}$ à $T \cdot p_\mathrm{max} + T = 3 \cdot p_\mathrm{max} + 3 $. 
 Nous sommons alors les valeurs des variables duales associées à cette contrainte que nous multiplions par $3$ pour obtenir la variation du coût optimal. 
 Après l'implémentation en Python, nous avons que le coût optimal reste inchangé après l'augmentation de la capacité de pompage, donc \underline{l'augmentation de notre capacité de pompage d'une unité n'influence pas notre coût total}.
 
 \subsection*{Turbinage}
 Enfin, nous pouvons observer l'influence d'une augmentation de la capacité de turbinage d'une valeur de $1 \unit{MW}$.
-Puisque nous travaillons sur des périodes de $T = 3 \unit{h}$, la valeur de la contrainte \eqref{eq:4C_contr6} est modifiée de $t_\mathrm{max}$ à $t_\mathrm{max} + 3$.
+Puisque nous travaillons sur des périodes de $T = 3 \unit{h}$, la valeur de la contrainte \eqref{eq:4C_contr6} est modifiée de $T \cdot t_\mathrm{max}$ à $T \cdot t_\mathrm{max} + T = 3 \cdot t_\mathrm{max} + 3 $.
 Nous sommons alors les valeurs des variables duales associées à cette contrainte que nous multiplions par $3$ pour obtenir la variation du coût optimal 
 et nous obtenons que le coût optimal diminue d'une valeur de $\mathbf{1.583.760,79}$ \euro, soit environ $0.001$\% de diminution. Cette diminution peut être expliquée par le fait que nous pouvons profiter davantage de l'apport fluvial pour la consommation d'énergie et ainsi moins dépendre des installations éoliennes.\\ 
 
