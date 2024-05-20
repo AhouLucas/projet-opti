@@ -32,9 +32,8 @@
 \section*{Question 4A}
 Puisque nous nous intéressons seulement aux bilans de productions/consommations et du niveau du bassin
 sur des périodes de $T \unit{h}$, nous pouvons exprimer toutes nos variables en fonction de cette période.\\
-Voici deux tableaux reprenant les notations principales utilisées dans cette seconde partie \footnote{Toutes autres notations utilisées dans la suite seront définies lorsque celles-ci seront introduites} : 
-
-\begin{table}[h!]
+Voici deux tableaux reprenant les notations principales utilisées pour cette seconde partie.
+\begin{table}[H]
     \centering
     \renewcommand{\arraystretch}{1.5}% Add spacing between rows : default value is 1
     \begin{tabular}{|c || c |} 
@@ -42,28 +41,29 @@ Voici deux tableaux reprenant les notations principales utilisées dans cette se
         Nom & Signification\\
         \hline\hline
         $c_i$ & Capacité éolienne installée sur le i\textsuperscript{ème} site\\
-        $t_j$ & Puissance à envoyer en turbinage choisie durant la j\textsuperscript{ème} période\\
-        $p_j$ & Puissance de pompage choisie durant la j\textsuperscript{ème} période\\
+        $t_j$ & Énergie à envoyer en turbinage choisie durant la j\textsuperscript{ème} période\\
+        $p_j$ & Énergie de pompage choisie durant la j\textsuperscript{ème} période\\
         \hline
     \end{tabular}
     \caption{Table des notations des variables de décisions utilisées pour le modèle de la question 4.}
     \label{table:notations_variables_4}
-\end{table}
-
-\begin{table}[h!]
+\end{table} 
+\begin{table}[H]
     \centering
     \renewcommand{\arraystretch}{1.5}% Add spacing between rows : default value is 1
     \begin{tabular}{|c || p{14cm} |} 
         \hline
         Nom & Signification\\
         \hline\hline
+        $T$ & Durée des périodes (en heures) \\
         $n$ & Nombre de sites éoliens \\
         $m$ & Nombre de périodes de $T \unit{h}$ dans une année\\
         $e_i(j)$ & Rendement éolien du i\textsuperscript{ème} site durant la j\textsuperscript{ème} période\\
+        $c_i^\mathrm{max}$ & Capacité maximale installable sur le i\textsuperscript{ème} site \\
         $a_j$ & Apport fluvial durant la j\textsuperscript{ème} période\\
         $\mathrm{cons}_j$ & Consommation énergétique durant la j\textsuperscript{ème} période\\
-        $t_\mathrm{max}$ & Capacité maximale d'énergie générée par le turbinage (Sur une période de T heures)\\
-        $p_\mathrm{max}$ & Capacité maximale de pompage (Sur une période de T heures)\\
+        $t_\mathrm{max}$ & Capacité maximale d'énergie générée par le turbinage (par heure)\\
+        $p_\mathrm{max}$ & Capacité maximale de pompage (par heure)\\
         $\mathrm{stock}_\mathrm{max}$ & Capacité de stockage maximale\\
         $\eta$ & Rendement de turbinage\\
         $\mathrm{costs}$ & Vecteur donnant les valeurs du coût d'installation d'un site éolien  (onshore/offshore) \newline $\mathrm{costs}_i = $ Coût d'installation d'un site onshore si le site d'index $i$ est onshore, et inversement.\\  
@@ -72,8 +72,6 @@ Voici deux tableaux reprenant les notations principales utilisées dans cette se
     \caption{Table des notations des constantes utilisées pour le modèle.}
     \label{table:notations_constantes}
 \end{table}
-
-\noindent
 Le modèle peut alors s'écrire ainsi :
 \begin{align}
     \min_{c_{i},t_j,p_j} \quad &\mathrm{costs}^\intercal\mathbf{c} \nonumber\\
@@ -81,11 +79,9 @@ Le modèle peut alors s'écrire ainsi :
     & 0 \le \frac{\mathrm{stock}_\mathrm{max}}{2}  + \sum_{j=0}^{k} p_j - t_j + a_j \le  \mathrm{stock}_\mathrm{max} \quad \forall k \in \{ 0, \ldots, m-2 \}\label{eq:4A_contr2}\\
     & \sum_{j=0}^{m-1} p_j - t_j + a_j = 0 \label{eq:4A_contr3}\\
     & 0 \le c_i \le c_i^\mathrm{max} \quad \forall i \in  \{ 0, \ldots, n-1 \}  \label{eq:4A_contr4}\\
-    & 0 \le \eta \cdot t_j \le  t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \}  \label{eq:4A_contr5}\\
-    & 0 \le p_j \le  p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4A_contr6}
+    & 0 \le \eta \cdot t_j \le  T \cdot t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \}  \label{eq:4A_contr5}\\
+    & 0 \le p_j \le  T \cdot p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4A_contr6}
 \end{align}
-
-\newpage
 
 La fonction objectif représente le coût total d'installation des éoliennes (en tenant compte des différences entre les installations \textit{offshore} et \textit{onshore}). \\
 La contrainte \eqref{eq:4A_contr2} fait le bilan lié aux variations des opérations de turbinage/pompage décidées et de l'apport fluvial naturel depuis la période $t = 0$ jusqu'en toute période $t = k$ afin de calculer l'augmentation/la diminution du niveau de l'eau dans le bassin 
@@ -115,7 +111,12 @@ car celui-ci fournissait les meilleures performances en termes de temps d'exécu
 Nous pouvons voir que les sites choisis ne se retrouvent que 8 fois en dehors des valeurs $\{0,1\}$, donc notre résolution
 tend souvent à soit installer la capacité maximale sur un site, soit ne rien n'y installer, en moyenne comme nous pouvons le voir sur la figure \ref{fig:Capacité_Eolienne_Q4}.
 Nous voyons également sur la figure \ref{fig:Niveau_bassin_Q4} que nous retrouvons bien le niveau du bassin initial à la fin de l'année. Sur la figure \ref{fig:Prod_Cons_Q4}, nous observons des écarts significatifs entre la production et la consommation, c'est-à-dire 
-qu'à certains moments, nous "gaspillons" de l'énergie car nous produisons trop (où nous avons bien retiré à la production l'énergie stockée dans le bassin sur le graphe afin de mettre en évidence le surplus de production).
+qu'à certains moments, nous "gaspillons" de l'énergie car nous produisons trop 
+(où nous avons bien retiré à la production l'énergie stockée dans le bassin sur le graphe afin de mettre en évidence le surplus de production).
+Notre temps de résolution est de 38.9 secondes, ce qui semble à priori raisonnable étant donné notre nombre 
+de variables qui est de 6482 et notre nombre de contraintes qui est de 21723 (bien que certains modèles puissent se résoudre plus rapidement 
+avec certaines contraintes ou variables en plus, nous pouvons nous attendre à ce qu'un tel modèle ne puisse pas être 
+résolu aussi rapidement à la main).
 
 \begin{figure}[h!]
     \centering
@@ -162,8 +163,8 @@ En réajustant le modèle dans la bonne formulation, nous avons alors :
     &\sum_{j=0}^{k} p_j - t_j + a_j - s_{3,k} =  -\frac{\mathrm{stock}_\mathrm{max}}{2} \quad \forall k \in \{ 0, \ldots, m-2 \} \label{eq:4C_contr3}\\
     & \sum_{j=0}^{m-1} p_j - t_j + a_j = 0\\
     &c_i + s_{4,i} = c_i^\mathrm{max} \quad \forall i \in  \{ 0, \ldots, n-1 \}\\
-    &\eta \cdot t_j + s_{5,j} = t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4C_contr6}\\
-    &p_j + s_{6,j} = p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4C_contr7}\\
+    &\eta \cdot t_j + s_{5,j} = T \cdot t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4C_contr6}\\
+    &p_j + s_{6,j} = T \cdot p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:4C_contr7}\\
     & c_i, t_j, p_j, s_{1,j}, s_{2,k}, s_{3,k}, s_{4,i}, s_{5,j}, s_{6,j} \geq 0
 \end{align}
 Où nous avons ajouté des variables d'écart $s_{\cdot,j}$ pour chaque contrainte contenant une inégalité.
@@ -212,8 +213,8 @@ Pour ce faire, nous rédéfinissons les variables $c_i$ de la question 4 :
         Nom & Signification\\
         \hline\hline
         $c_{i} \in \{ 0, 1, 2 \}$ & Proportion de la capacité maximale $c_i^\mathrm{max}$ installée sur le i\textsuperscript{ème} site\\
-        $t_j$ & Puissance à envoyer en turbinage choisie durant la j\textsuperscript{ème} période\\
-        $p_j$ & Puissance de pompage choisie durant la j\textsuperscript{ème} période\\
+        $t_j$ & Énergie à envoyer en turbinage choisie durant la j\textsuperscript{ème} période\\
+        $p_j$ & Énergie de pompage choisie durant la j\textsuperscript{ème} période\\
         \hline
     \end{tabular}
     \caption{Table des nouvelles notations des variables de décisions utilisées pour le modèle de la question 5.}
@@ -232,8 +233,8 @@ Pour ce faire, nous rédéfinissons les variables $c_i$ de la question 4 :
     & 0 \le \frac{\mathrm{stock}_\mathrm{max}}{2}  + \sum_{j=0}^{k} p_j - t_j + a_j \le  \mathrm{stock}_\mathrm{max} \quad \forall k \in \{ 0, \ldots, m-2 \}\label{eq:5_contr2}\\
     & \sum_{j=0}^{m-1} p_j - t_j + a_j = 0 \label{eq:5_contr3}\\
     & 0\le c_i \le 2 \quad \forall i \in  \{ 0, \ldots, n-1 \} \label{eq:5_contr4}  \\
-    & 0 \le \eta \cdot t_j \le  t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:5_contr5}\\
-    & 0 \le p_j \le  p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:5_contr6} 
+    & 0 \le \eta \cdot t_j \le T \cdot t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:5_contr5}\\
+    & 0 \le p_j \le T \cdot p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:5_contr6} 
 \end{align}
 Ici, seule les contraintes sur les $c_i$ ont été modifiées. Nous imposons maintenant que les $c_i$ soient des entiers compris entre 0 et 2 (compris).
 La fonction objectif a également dû être adaptée selon notre nouveau choix de variables.
@@ -246,7 +247,9 @@ testé avec 2920 périodes (au complet), avec le solver par défaut de \verb|CVX
 d'exécution et avons alors arrêté. Nous avons ensuite testé avec le solver \verb|SCIPY| et avons arrêté au-dessus de 120
 minutes. Nous avons en second lieu réduit le nombre de périodes à 1500, nous avions excédé les 65
 minutes avec encore le solver \verb|SCIPY|. Enfin, nous avons défini le nombre de périodes à \textbf{1000}, et nous arrivons
-à \textbf{46 minutes et 10.5 secondes} de calcul. Nous avons conclu que ce dernier choix de durée était raisonnable.
+à \textbf{46 minutes et 10.5 secondes} de calcul. Nous avons conclu que ce dernier choix de durée était raisonnable. Pour la résolution du problème 
+de la question 4 restreint à 1000 périodes, nous avons 4.9 secondes de calcul, la différence de performance est gigantesque, pourtant nous n'avons
+fait que transformer des variables continues en discrètes, mais les variables discrètes sont bien moins performantes en règle générale en grand nombre.
 Ensuite, nous supposons que le coût d'installation des éoliennes
 est réduit à la durée étudiée, c'est à dire que notre vrai vecteur de coûts sera donné par "$\frac{1000}{2920} \mathrm{costs}$".
 Nous effectuons les calculs sur le solver pour le coût initial ($\mathrm{costs}$), ensuite nous ajustons 
@@ -325,8 +328,8 @@ Nous avons donc les nouvelles variables suivantes :
         Nom & Signification\\
         \hline\hline
         $c_i$ & Capacité éolienne installée sur le i\textsuperscript{ème} site\\
-        $t_j$ & Puissance à envoyer en turbinage choisie durant la j\textsuperscript{ème} période\\
-        $p_j$ & Puissance de pompage choisie durant la j\textsuperscript{ème} période\\
+        $t_j$ & Énergie à envoyer en turbinage choisie durant la j\textsuperscript{ème} période\\
+        $p_j$ & Énergie de pompage choisie durant la j\textsuperscript{ème} période\\
         $g_\mathrm{tot}$ & Puissance totale à installer pour les centrales à gaz\\
         $g_j$ & \'Energie produite par les centrales à gaz durant la j\textsuperscript{ème} période\\
         \hline
@@ -344,9 +347,9 @@ Le modèle devient alors :
     & 0 \le \frac{\mathrm{stock}_\mathrm{max}}{2}  + \sum_{j=0}^{k} p_j - t_j + a_j \le  \mathrm{stock}_\mathrm{max} \quad \forall k \in \{ 0, \ldots, m-2 \}\label{eq:6_contr2}\\
     & \sum_{j=0}^{m-1} p_j - t_j + a_j = 0 \label{eq:6_contr3}\\
     & 0 \le c_i \le c_i^\mathrm{max} \quad \forall i \in  \{ 0, \ldots, n-1 \}  \label{eq:6_contr4}\\
-    & 0 \le \eta \cdot t_j \le  t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \}  \label{eq:6_contr5}\\
-    & 0 \le p_j \le  p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:6_contr6}\\
-    & 0 \le g_j \le g_\mathrm{tot} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:6_contr7}
+    & 0 \le \eta \cdot t_j \le  T \cdot t_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \}  \label{eq:6_contr5}\\
+    & 0 \le p_j \le  T \cdot p_\mathrm{max} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:6_contr6}\\
+    & 0 \le g_j \le T \cdot g_\mathrm{tot} \quad \forall j \in  \{ 0, \ldots, m-1 \} \label{eq:6_contr7}
 \end{align}
 
 \noindent où $\mathrm{gas\_prod\_cost}$ est le coût de production d'énergie par les centrales à gaz et $\mathrm{gas\_install\_cost}$ est le coût d'installation des centrales à gaz.\\
@@ -356,12 +359,15 @@ Enfin, une dernière contrainte \eqref{eq:6_contr7} est ajoutée pour limiter la
 \pagebreak
 
 \subsection*{Résolution}
-Après la résolution numérique, nous obtenons une valeur moyenne de $\mathbf{48.15}$ \euro/MWh, ce qui est mieux que 
+Après la résolution numérique, nous obtenons une valeur moyenne de $\mathbf{45.28}$ \euro/MWh, ce qui est mieux que 
 le résultat de la question 4 ($\mathbf{58.282}$ \euro/MWh). Cela peut s'expliquer par le fait que nous
 avons plus de possibilités, dans le sens que nous pouvons ajuster la production avec un levier en plus,
 ce qui fait que nous pouvons mieux répartir notre production énergétique afin de minimiser le coût. \\
-L'introduction des variables concernant le gaz ne semble pas avoir influencé les capacités éoliennes installées 
-par rapport à la question 4 (\autoref{fig:Capacité_Eolienne_Q4} / \autoref{fig:Q60}). 
+Notre temps de résolution passe de 38.9 secondes à 1 minute et 35.8 secondes, ce qui semble cohérent car nous sommes passés
+de 6482 variables à 9403, puis de 21723 à 27563 contraintes, chose qui semble cohérente car nous augmentons la taille du problème, donc
+en général la complexité augmente. 
+L'introduction des variables concernant le gaz ne semble pas avoir beaucoup influencé les capacités installées par rapport à la question 4 (\autoref{fig:Capacité_Eolienne_Q4} / \autoref{fig:Q60}), nous avons
+globalement le même nombre de variables intermédiaires (ni 0 ni 1) et le reste concentré aux proportions extrêmes de 0 et 1. 
 Le pompage est cette fois plus utilisé que dans la question 4 (\autoref{fig:Turbinage_pompage_Q4})
 Bien que délicat à bien illustrer, nous pouvons voir que les valeurs de production et de consommation sont 
 assez proches (comme nous pouvons le voir sur la figure \ref{fig:Q63}).
