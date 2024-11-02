@@ -1,3 +1,5 @@
+env/
+
 # Ignore data folders
-/Partie1/Data-partie-1
-/Partie2/Data-partie-2
+Partie1/Data-partie-1/
+Partie2/Data-partie-2/
